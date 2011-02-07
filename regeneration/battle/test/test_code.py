@@ -69,7 +69,7 @@ def testStyle(name, filename):
                     filename
             )
 
-badWordRe = re.compile('pok.{1,2}(mon|dex|ball)', re.I)
+badWordRe = re.compile('pok.{1,2}(mon|dex|ball)|(p)arameter', re.I)
 @forAllFiles
 def testTerminology(name, filename):
     if name == 'example':
