@@ -16,10 +16,14 @@ setup(
     author=__author__,
     author_email=__email__,
     install_requires=[
-            "pokedex>=0.1",  # For the example/tests :)
             "pyyaml>=3.0",
         ],
-    setup_requires=[],
+    setup_requires=[
+            'nose>=0.11',
+        ],
+    tests_require=[
+            "pokedex>=0.1",
+        ],
     packages = find_packages(),
     namespace_packages = ['regeneration'],
 
