@@ -1,9 +1,9 @@
 #! /usr/bin/python
 # Encoding: UTF-8
 
-__copyright__ = "Copyright 2009-2011, Petr Viktorin"
-__license__ = "MIT"
-__email__ = "encukou@gmail.com"
+__copyright__ = 'Copyright 2009-2011, Petr Viktorin'
+__license__ = 'MIT'
+__email__ = 'encukou@gmail.com'
 
 class _EnumMetaclass(type):
     def __init__(cls, name, bases, dct):

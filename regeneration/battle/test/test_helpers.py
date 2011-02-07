@@ -8,7 +8,11 @@ from nose.tools import assert_equal, assert_raises
 from regeneration.battle import stats
 from regeneration.battle import gender
 
-def assert_all_equal(head, *tail):
+__copyright__ = 'Copyright 2011, Petr Viktorin'
+__license__ = 'MIT'
+__email__ = 'encukou@gmail.com'
+
+def assert_all_equal(head, *tail):  # not camelCase, to match nosetests API
     for i, item in enumerate(tail):
         assert_equal(head, item,
                 'Item %d (%r) is not equal to %r' % (i + 1, item, head)
@@ -34,7 +38,7 @@ def quiet(func):
     return hushedTest
 
 @quiet
-def test_stats():
+def testStats():
     assert_equal(len(stats.Stat), 6)
     assert_equal(stats.Stat.sat.name, 'Special Attack')
     assert_equal(stats.Stat.sat.number, 4)
@@ -79,16 +83,12 @@ def test_stats():
     assert_all_equal(9, statdict['hp'], statdict[0], statdict[stats.Stat.hp])
     assert_all_equal(10, statdict['atk'], statdict[1], statdict[stats.Stat.atk])
 
-    def set_foo():
+    def setFoo():
         statdict['foo'] = 11
-    assert_raises(KeyError, set_foo)
-
-    def set_acc():
-        statdict['acc'] = 11
-    assert_raises(KeyError, set_acc)
+    assert_raises(KeyError, setFoo)
 
 @quiet
-def test_genders():
+def testGenders():
     assert_equal(gender.Gender.male.symbol, u'♂')
     assert_equal(gender.Gender.female.opposite.symbol, u'♂')
     assert_equal(gender.Gender.male.opposite.symbol, u'♀')

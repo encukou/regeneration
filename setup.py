@@ -3,7 +3,7 @@
 
 from setuptools import setup, find_packages
 
-__copyright__ = "Copyright 2009-2010, Petr Viktorin"
+__copyright__ = "Copyright 2009-2011, Petr Viktorin"
 __license__ = "MIT"
 __version__ = '0.1'
 __author__ = 'Petr "En-Cu-Kou" Viktorin'
@@ -16,7 +16,7 @@ setup(
     author=__author__,
     author_email=__email__,
     install_requires=[
-            "pokedex>=0.1",
+            "pokedex>=0.1",  # For the example/tests :)
             "pyyaml>=3.0",
         ],
     setup_requires=[],
