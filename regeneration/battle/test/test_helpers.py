@@ -1,8 +1,12 @@
+#! /usr/bin/python
+# Encoding: UTF-8
+
 import sys
 
 from nose.tools import assert_equal, assert_raises
 
 from regeneration.battle import stats
+from regeneration.battle import gender
 
 def assert_all_equal(head, *tail):
     for i, item in enumerate(tail):
@@ -82,3 +86,11 @@ def test_stats():
     def set_acc():
         statdict['acc'] = 11
     assert_raises(KeyError, set_acc)
+
+@quiet
+def test_genders():
+    assert_equal(gender.Gender.male.symbol, u'♂')
+    assert_equal(gender.Gender.female.opposite.symbol, u'♂')
+    assert_equal(gender.Gender.male.opposite.symbol, u'♀')
+    assert_equal(gender.Gender.none.symbol, u'–')
+    assert_equal(gender.Gender.none.opposite, None)
