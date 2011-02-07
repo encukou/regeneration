@@ -78,3 +78,7 @@ class Battler(object):
     def setMove(self, i, kind):
         self.moves = list(self.moves)
         self.moves[i] = Move(kind)
+
+    @property
+    def field(self):
+        return self.spot.field
