@@ -23,7 +23,7 @@ class _EnumMetaclass(type):
             if isinstance(identifiers, basestring):
                 # Despite what Guido may think, treating strings as iterables
                 # in a dynamic language is just dumb.
-                raise TypeError(
+                raise ValueError(
                         "identifiers of enum class %s may not be a string. "
                         "Did you forget a .split()?" % cls.__name__
                     )
@@ -41,8 +41,15 @@ class _EnumMetaclass(type):
     def __len__(self):
         return len(self._identifiers)
 
+    def __getattr__(self, identifier):
+        if identifier.endswith('_'):
+            return getattr(self, identifier.rstrip('_'))
+        else:
+            raise AttributeError(identifier)
+
     def __getitem__(self, number):
         if isinstance(number, basestring):
+            # actually an identifier
             try:
                 return getattr(self, number)
             except AttributeError:

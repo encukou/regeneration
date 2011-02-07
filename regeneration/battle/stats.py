@@ -37,13 +37,26 @@ class Stats(dict):
     """
     _statEnum = Stat
 
-    @classmethod
-    def Random(cls, min, max, rand=random, statEnum=Stat):
-        self = cls()
-        self._statEnum = statEnum
-        for stat in statEnum:
-            self.addItem(stat, rand.randint(min, max))
-        return self
+    def __init__(self, min=0, max=None, rand=random, statEnum=Stat):
+        """Create a new set of stats
+
+        If min is a dict-like objects, stats will get copied from it.
+
+        If max is given, the values will be random between min and max
+            (as given by rand)
+        Otherwise, they will all get set to min, or 0 by default.
+
+        If statEnum is given, it is an Enum used for the keys (default is Stat)
+        """
+        try:
+            dict.__init__(self, min)
+        except TypeError:
+            self._statEnum = statEnum
+            for stat in statEnum:
+                if max is None:
+                    self.addItem(stat, min)
+                else:
+                    self.addItem(stat, rand.randint(min, max))
 
     def __getitem__(self, item):
         try:
@@ -91,7 +104,3 @@ class Stats(dict):
                 ([s for s in Stat if s.identifier==k][0], v)
                 for k, v in dct.items()
             )
-
-    def __deepcopy__(self, memo):
-        return self.__class__(self)
-
