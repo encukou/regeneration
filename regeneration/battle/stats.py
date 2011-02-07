@@ -68,7 +68,7 @@ class Stats(dict):
         if attr[:1] == '_':
             self.__dict__[attr] = value
         else:
-            self[self._statEnum[attr]] = value
+            self[self._statEnum[attr.rstrip('_')]] = value
 
     def addItem(self, item, value):
         """As __setitem__, but allows setting keys that don't exist yet.
@@ -83,12 +83,13 @@ class Stats(dict):
         return "<Stats: {"+", ".join(str(s)+": "+str(self[s]) for s in self._statEnum)+"}>"
 
     def save(self):
-        return dict((k.name, v) for k, v in self.items())
+        return dict((k.identifier, v) for k, v in self.items())
 
     @classmethod
     def load(cls, dct):
         return cls(
-                ([s for s in Stat if s.name==k][0], v) for k, v in dct.items()
+                ([s for s in Stat if s.identifier==k][0], v)
+                for k, v in dct.items()
             )
 
     def __deepcopy__(self, memo):
