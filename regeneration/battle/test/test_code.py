@@ -25,7 +25,7 @@ def forAllFiles(func):
     wrapped.__name__ = func.__name__
     return wrapped
 
-defOrClassRe = re.compile('(def|class) +([a-z_A-Z]+)(\(?)')
+defOrClassRe = re.compile('(def|class) +([a-z_A-Z0-9]+)(\(?)')
 filePropRe = re.compile('__([a-z]+)__ = (.*)')
 @forAllFiles
 def testStyle(name, filename):
@@ -68,8 +68,9 @@ def testStyle(name, filename):
                 "%s: Missing/bad MIT license (use 'MIT', with single quotes)" %
                     filename
             )
+        assert '2010' not in fileProps.get('copyright', '')
 
-badWordRe = re.compile('pok.{1,2}(mon|dex|ball)|(p)arameter', re.I)
+badWordRe = re.compile('pok.{1,2}(mon|dex|ball)|p(arameter|kmn)', re.I)
 @forAllFiles
 def testTerminology(name, filename):
     if name == 'example':

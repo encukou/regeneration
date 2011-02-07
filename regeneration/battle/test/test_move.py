@@ -3,7 +3,9 @@
 
 from nose.tools import assert_equal, assert_almost_equal
 
+
 from regeneration.battle.example import connect, tables
+from regeneration.battle.test import quiet
 
 from regeneration.battle import move
 
@@ -11,6 +13,7 @@ __copyright__ = 'Copyright 2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
+@quiet
 def testMove():
     session = connect()
     pound = move.Move(session.query(tables.Move).filter_by(id=1).one())

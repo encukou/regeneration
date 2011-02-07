@@ -55,10 +55,7 @@ loader = Loader(connect())
 
 @property
 def getIdentifier(self):
-    if self.name:
-        return self.name.lower().replace(' ', '-')
-    else:
-        return self.name
+    return self.name.lower().replace(' ', '-')
 
 def patchIdentifier(table):
     if not hasattr(table, 'identifier'):

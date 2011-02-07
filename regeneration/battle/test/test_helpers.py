@@ -1,9 +1,9 @@
 #! /usr/bin/python
 # Encoding: UTF-8
 
-import sys
-
 from nose.tools import assert_equal, assert_raises, raises
+
+from regeneration.battle.test import assert_all_equal, quiet
 
 from regeneration.battle import enum
 from regeneration.battle import stats
@@ -12,31 +12,6 @@ from regeneration.battle import gender
 __copyright__ = 'Copyright 2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
-
-def assert_all_equal(head, *tail):  # not camelCase, to match nosetests API
-    for i, item in enumerate(tail):
-        assert_equal(head, item,
-                'Item %d (%r) is not equal to %r' % (i + 1, item, head)
-            )
-
-class Tee():
-    def __init__(self, origstream):
-        self.origstream = origstream
-        self.writtenItems = []
-
-    def write(self, str):
-        self.origstream.write(str)
-        self.writtenItems.append(str)
-
-def quiet(func):
-    def hushedTest(*args, **kwargs):
-        sys.stdout = tee = Tee(sys.stdout)
-        origStdout = sys.stdout
-        func(*args, **kwargs)
-        sys.stdout = origStdout
-        assert_equal(tee.writtenItems, [], 'Test wrote to stdout')
-    hushedTest.__name__ = func.__name__
-    return hushedTest
 
 @quiet
 def testStats():
@@ -101,6 +76,8 @@ def testStats():
             '<Stats: {HP: 9, Attack: 10, Defense: 6, Speed: 6, '
                 'Special Attack: 6, Special Defense: 6}>',
         )
+
+    assert_equal(repr(stats.Stat.def_), '<Stat Defense>') 
 
 @quiet
 def testGenders():

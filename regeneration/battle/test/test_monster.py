@@ -1,10 +1,9 @@
 #! /usr/bin/python
 # Encoding: UTF-8
 
-from nose.tools import assert_equal, assert_almost_equal
-import yaml
-import difflib
+from nose.tools import assert_almost_equal
 
+from regeneration.battle.test import FakeRand, quiet, assert_equal
 from regeneration.battle.example import connect, tables, loader
 
 from regeneration.battle import monster
@@ -13,13 +12,7 @@ __copyright__ = 'Copyright 2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
-class FakeRand(object):
-    def randint(self, a, b):
-        return 0
-
-    def choice(self, lst):
-        return lst[0]
-
+@quiet
 def testMonster():
     session = connect()
 
@@ -45,11 +38,6 @@ def testMonster():
         saved = mon.save()
         loaded = monster.Monster.load(saved, loader)
         resaved = loaded.save()
-        if saved != resaved:
-            for line in difflib.ndiff(
-                    *(yaml.safe_dump(x).splitlines() for x in (saved, resaved))
-                ):
-                print line
         assert_equal(saved, resaved)
     roundtrip(bulba)
 
@@ -87,6 +75,7 @@ def testMonster():
     assert_equal(gon.ability.identifier, 'trace')
     assert_equal(gon.gender.identifier, 'none')
 
+@quiet
 def testLoader():
     assert loader.loadForm(1).id == 1
     assert loader.loadMove(1).id == 1

@@ -2,9 +2,8 @@
 # Encoding: UTF-8
 
 from nose.tools import assert_equal, assert_almost_equal
-import yaml
-import difflib
 
+from regeneration.battle.test import quiet
 from regeneration.battle.example import connect, tables, loader
 
 from regeneration.battle import battler, monster
@@ -20,6 +19,7 @@ class FakeRand(object):
     def choice(self, lst):
         return lst[0]
 
+@quiet
 def testBattler():
     session = connect()
 
