@@ -5,6 +5,7 @@ from fractions import Fraction
 from collections import namedtuple
 from functools import partial
 
+from regeneration.battle.effect import EffectSubject
 from regeneration.battle.stats import Stats, BattleStat
 from regeneration.battle.move import Move
 
@@ -12,7 +13,7 @@ __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
-class Battler(object):
+class Battler(EffectSubject):
     """A currently-sent-out monster.
 
     This class includes everything that can be set on a Monster in battle.
