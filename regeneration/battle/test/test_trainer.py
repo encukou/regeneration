@@ -32,18 +32,22 @@ class TestTrainer(QuietTestCase):
                 FakeRand(),
             )
 
-        self.request = Object()
-        self.request.allowed = lambda command: True
-        self.request.commands = lambda: [
-                command.MoveCommand(self.request, 'm'),
-                command.MoveCommand(self.request, 'n'),
-            ]
-        self.request.field = Object()
-        self.request.field.possibleTargets = lambda command: ['c', 'd']
+        self.move = Object()
+        self.move.targetting = Object()
+        self.move.targetting.chooseList = lambda u, b: ['c', 'd']
 
-    def checkMoveResult(self, result, command='move', move='m', target='c'):
+        self.request = Object()
+        self.request.commands = lambda: [
+                command.MoveCommand(self.request, self.move),
+            ]
+        self.request.battler = Object()
+        self.request.field = Object()
+        self.request.field.battlers = [self.request.battler]
+        self.request.field.commandAllowed = lambda command: True
+
+    def checkMoveResult(self, result, command='move', target='c'):
         assert_equal(result.command, command)
-        assert_equal(result.move, move)
+        assert_equal(result.move, self.move)
         assert_equal(result.target, target)
 
     def testTrainer(self):
@@ -51,12 +55,12 @@ class TestTrainer(QuietTestCase):
         self.checkMoveResult(result)
 
     def testOneTarget(self):
-        self.request.field.possibleTargets = lambda command: ['e']
+        self.move.targetting.chooseList = lambda u, b: ['e']
         result = self.trainer.requestCommand(self.request)
         self.checkMoveResult(result, target='e')
 
     def testNoTarget(self):
-        self.request.field.possibleTargets = lambda command: []
+        self.move.targetting.chooseList = lambda u, b: []
         result = self.trainer.requestCommand(self.request)
         self.checkMoveResult(result, target=None)
 

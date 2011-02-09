@@ -31,7 +31,7 @@ class FakeField(effect.EffectSubject):
     def flipCoin(self, chance, blurb):
         return True
 
-    def calculateMoveDamage(self, hit):
+    def calculateDamage(self, hit):
         return hit.power / 2
 
 class TestMoveEffectFlags(QuietTestCase):
@@ -87,18 +87,20 @@ class TestMoveEffect(QuietTestCase):
         self.move.accuracy = 0.5
         self.move.damageClass = Object()
         self.move.targetting = Object()
-        self.move.targetting.getTargets = lambda u, t: [t]
+        self.move.targetting.targets = lambda u, t: [t]
         self.move.pp = 5
 
         self.user = Object()
         self.user.field = self.field
-        self.user.fainted = False
-        self.user.hp = 30
+        self.user.battler = Object()
+        self.user.battler.fainted = False
+        self.user.battler.hp = 30
 
         self.target = Object()
         self.target.field = self.field
-        self.target.fainted = False
-        self.target.hp = 40
+        self.target.battler = Object()
+        self.target.battler.fainted = False
+        self.target.battler.hp = 40
 
         self.moveeffect = moveeffect.MoveEffect(
                 field=self.field,
@@ -108,18 +110,18 @@ class TestMoveEffect(QuietTestCase):
             )
 
     def assertChanges(self, hp=40, pp=5):
-        assert_equal(self.target.hp, hp)
+        assert_equal(self.target.battler.hp, hp)
         assert_equal(self.move.pp, pp)
 
     def testMoveEffect(self):
-        self.moveeffect.beginTurn(self.field, self.user, self.target)
+        self.moveeffect.beginTurn()
         (hit, ) = self.moveeffect.attemptUse()
         assert_equal(hit.damage, 10)
         self.assertChanges(hp=30, pp=4)
 
     def testCopyToUser(self):
         me = self.moveeffect.copyToUser(self.user)
-        me.beginTurn(self.field, self.user, self.target)
+        me.beginTurn()
         (hit, ) = me.attemptUse()
         assert_equal(hit.damage, 10)
         self.assertChanges(hp=30, pp=4)
@@ -151,11 +153,11 @@ class TestMoveEffect(QuietTestCase):
         self.assertChanges(hp=30, pp=4)
 
     def testMultipleTargets(self):
-        self.move.targetting.getTargets = lambda u, t: [t, self.user]
+        self.move.targetting.targets = lambda u, t: [t, self.user]
         (hitA, hitB) = self.moveeffect.attemptUse()
         assert_equal(hitA.damage, 10)
         assert_equal(hitB.damage, 10)
         assert_equal(hitA.target, self.target)
         assert_equal(hitB.target, self.user)
         self.assertChanges(hp=30, pp=4)
-        assert_equal(self.user.hp, 20)
+        assert_equal(self.user.battler.hp, 20)

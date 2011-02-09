@@ -4,11 +4,11 @@
 from fractions import Fraction
 
 from regeneration.battle.enum import Enum
+from regeneration.battle.movetargetting import MoveTargetting
 
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
-
 
 class Move(object):
     """ Represents an individual move
@@ -33,6 +33,8 @@ class Move(object):
 
         self.kind = kind
         self.pp = self.maxpp = maxpp
+
+        self.targetting = MoveTargetting.byIdentifier(kind.target.identifier)
 
         # We like convenient-er accessors to common things
         self.flags = MoveFlags(kind)

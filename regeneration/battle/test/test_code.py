@@ -33,6 +33,7 @@ def testStyle(name, filename):
     empty = True
     for lineno, line in enumerate(open(filename), 1):
         line = line.rstrip('\n')
+        if line == 'CHECK@END': return
         if line:
             empty = False
         info = filename, lineno
@@ -73,9 +74,10 @@ def testStyle(name, filename):
 badWordRe = re.compile('pok.{1,2}(mon|dex|ball)|p(arameter|kmn)', re.I)
 @forAllFiles
 def testTerminology(name, filename):
-    if name == 'example':
+    if name in 'example movetargetting'.split():
         return
     for lineno, line in enumerate(open(filename), 1):
+        if line.strip() == 'CHECK@END': return
         assert not badWordRe.search(line), '%s:%s: Watch your terminology' % (
                 filename, lineno
             )

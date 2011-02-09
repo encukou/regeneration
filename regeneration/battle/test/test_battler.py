@@ -19,16 +19,19 @@ class FakeRand(object):
     def choice(self, lst):
         return lst[0]
 
+class FakeSpot(object):
+    field = None
+
 @quiet
 def testBattler():
     session = connect()
 
     species = session.query(tables.Form).filter_by(id=1).one()
     bulba = monster.Monster(species, 30, loader.natures, rand=FakeRand())
-    bulba = battler.Battler(bulba, None)
+    bulba = battler.Battler(bulba, FakeSpot())
 
     assert_equal(bulba.ability.id, 65)
-    bulba.ability = loader.loadAbility(1)
+    bulba.ability = loader.loadAbility('stench')
     assert_equal(bulba.ability.id, 1)
     assert_equal(bulba.monster.ability.id, 65)
 
@@ -37,7 +40,7 @@ def testBattler():
             [m.kind.identifier for m in bulba.moves],
             'double-edge growth sweet-scent razor-leaf'.split(),
         )
-    bulba.setMove(0, loader.loadMove(1))
+    bulba.setMove(0, loader.loadMove('pound'))
     assert_equal(
             [m.kind.identifier for m in bulba.moves],
             'pound growth sweet-scent razor-leaf'.split(),
@@ -61,7 +64,7 @@ def testBattler():
     assert bulba.monster.status == monster.Status.par
 
     assert_equal(bulba.item, None)
-    bulba.item = loader.loadItem(30)
+    bulba.item = loader.loadItem('fresh-water')
     assert_equal(bulba.item.id, 30)
     assert_equal(bulba.monster.item.id, 30)
 

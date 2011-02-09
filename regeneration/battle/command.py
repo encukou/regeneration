@@ -48,7 +48,10 @@ class MoveCommand(Command):
 
     @property
     def possibleTargets(self):
-        return self.field.possibleTargets(self)
+        return self.move.targetting.chooseList(
+                self.request.battler,
+                self.field.battlers,
+            )
 
     @property
     def args(self):
@@ -98,10 +101,12 @@ class CommandRequest(object):
     switches, etc., and a commands() that includes them all. Only legal
     commands are returned.
     """
-    def __init__(self, battler):
-        self.battler = battler
+    def __init__(self, spot):
+        self.spot = spot
 
     def moves(self, moves=None):
+        if not self.battler:
+            return
         if moves is None:
             moves = self.battler.moves
         haveSomeMoves = False
@@ -119,7 +124,7 @@ class CommandRequest(object):
     @iterIfAllowed
     def switches(self, replacements=None):
         if replacements is None:
-            replacements = self.battler.spot.trainer.team
+            replacements = self.spot.trainer.team
         for replacement in replacements:
             if not replacement.fainted:
                 yield SwitchCommand(self, replacement=replacement)
@@ -151,4 +156,8 @@ class CommandRequest(object):
 
     @property
     def field(self):
-        return self.battler.field
+        return self.spot.field
+
+    @property
+    def battler(self):
+        return self.spot.battler

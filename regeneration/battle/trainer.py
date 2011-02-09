@@ -25,7 +25,7 @@ class Trainer(object):
         """
         chain = itertools.chain(self.getCommands(request), request.commands())
         for command in chain:
-            if request.allowed(command):
+            if command.allowed:
                 if command.command == 'move' and not command.target:
                     possibleTargets = command.possibleTargets
                     if len(possibleTargets) == 0:

@@ -17,7 +17,7 @@ __email__ = 'encukou@gmail.com'
 def testStats():
     assert_equal(len(stats.Stat), 6)
     assert_equal(stats.Stat.sat.name, 'Special Attack')
-    assert_equal(str(stats.Stat.def_), 'Defense')
+    assert_equal(str(stats.Stat.def_), 'def')
     assert_equal(stats.Stat.sat.number, 4)
     assert_equal(
             [s.identifier for s in stats.Stat],
@@ -73,11 +73,11 @@ def testStats():
 
     assert_equal(
             str(statdict),
-            '<Stats: {HP: 9, Attack: 10, Defense: 6, Speed: 6, '
-                'Special Attack: 6, Special Defense: 6}>',
+            '<Stats: {hp: 9, atk: 10, def: 6, spd: 6, '
+                'sat: 6, sde: 6}>',
         )
 
-    assert_equal(repr(stats.Stat.def_), '<Stat Defense>') 
+    assert_equal(repr(stats.Stat.def_), '<Stat def>') 
 
 @quiet
 def testGenders():

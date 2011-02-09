@@ -84,16 +84,16 @@ class Enum(object):
         self.number = number
 
     def __str__(self):
-        return self.name
+        return self.identifier
 
     def __repr__(self):
-        return '<%s %s>' % (self.__class__.__name__, self.name)
+        return '<%s %s>' % (self.__class__.__name__, self.identifier)
 
     @classmethod
-    def _add(cls, name):
+    def _add(cls, identifier):
         number = len(cls)
-        newitem = cls(number, name, _privateConstructor=True)
-        setattr(cls, name, newitem)
+        newitem = cls(number, identifier, _privateConstructor=True)
+        setattr(cls, identifier, newitem)
         cls._identifiers.append(newitem)
 
     def __lt__(self, other):

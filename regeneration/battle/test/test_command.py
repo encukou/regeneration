@@ -28,10 +28,8 @@ class FakeField(object):
     def commandSelected(self, command):
         self.selectedCommands.append(command)
 
-    def possibleTargets(self, command):
-        return ['none']
-
-    struggle = loader.loadMove(165)
+    struggle = loader.loadStruggle()
+    battlers = ['none']
 
 class FakeMonster(object):
     fainted = False
@@ -55,8 +53,9 @@ class TestCommand(QuietTestCase):
         super(TestCommand, self).setUp()
         self.bulba = monster.Monster(self.species, 30, loader.natures, rand=FakeRand())
         self.battler = battler.Battler(self.bulba, FakeSpot())
+        self.battler.spot.battler = self.battler
 
-        self.request = command.CommandRequest(self.battler)
+        self.request = command.CommandRequest(self.battler.spot)
 
     @quiet
     def testMoveCommands(self):
@@ -131,14 +130,6 @@ class TestCommand(QuietTestCase):
         for cmd in self.request.commands():
             if cmd != struggle:
                 raise AssertionError('%s is not allowed' % cmd)
-
-    @quiet
-    def testTargetOptions(self):
-        for cmd in self.request.commands():
-            if cmd.command == 'move':
-                assert_equal(list(cmd.possibleTargets), ['none'])
-            else:
-                assert_equal(list(cmd.possibleTargets), [])
 
     @quiet
     def testTargets(self):

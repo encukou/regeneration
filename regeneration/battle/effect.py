@@ -240,6 +240,12 @@ class Effect(object):
         """
         return
 
+    @callback
+    def beginTurn(self, turnNumber):
+        """Called when a turn begins
+        """
+        return
+
     # Cancellers
 
     @callback
@@ -248,6 +254,12 @@ class Effect(object):
 
         None cancels the application(return the original effect if that's what
         you want to do).
+        """
+        return False
+
+    @callback
+    def preventMoveSelection(self, command):
+        """Return true to prevent the selection of a move
         """
         return False
 
@@ -290,3 +302,9 @@ class Effect(object):
         """Modify a hit's damage
         """
         return pp
+
+    @chain
+    def speedFactor(self, field, speedFactor):
+        """Modify the global speed factor
+        """
+        return speedFactor

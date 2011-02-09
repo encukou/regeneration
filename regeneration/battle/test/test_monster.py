@@ -45,16 +45,16 @@ def testMonster():
     bulba.effort.hp = 100
     bulba.genes.def_ = 3
     bulba.name = 'Testcase exhibit B'
-    bulba.item = loader.loadItem(30)
+    bulba.item = loader.loadItem('fresh-water')
     bulba.gender = bulba.gender.opposite
     bulba.nature = loader.natures[1]
-    bulba.ability = loader.loadAbility(20)
+    bulba.ability = loader.loadAbility('own-tempo')
     bulba.tameness = 0
     bulba.hp = 0
     bulba.status = monster.Status.par
-    bulba.setMoves([loader.loadMove(80), loader.loadMove(30)])
-    bulba.setMove(0, loader.loadMove(1))
-    assert_equal([move.kind.id for move in bulba.moves], [1, 30])
+    bulba.setMoves([loader.loadMove('petal-dance'), loader.loadMove('bind')])
+    bulba.setMove(0, loader.loadMove('pound'))
+    assert_equal([move.kind.identifier for move in bulba.moves], ['pound', 'bind'])
     assert bulba.fainted
     bulba.recalculateStats()
 
@@ -77,8 +77,8 @@ def testMonster():
 
 @quiet
 def testLoader():
-    assert loader.loadForm(1).id == 1
-    assert loader.loadMove(1).id == 1
-    assert loader.loadNature(1).id == 1
-    assert loader.loadAbility(1).id == 1
-    assert loader.loadItem(1).id == 1
+    assert loader.loadForm('hypno').species.identifier == 'hypno'
+    assert loader.loadMove('gust').identifier == 'gust'
+    assert loader.loadNature('brave').identifier == 'brave'
+    assert loader.loadAbility('minus').identifier == 'minus'
+    assert loader.loadItem('stick').identifier == 'stick'

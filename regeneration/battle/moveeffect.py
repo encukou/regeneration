@@ -60,9 +60,11 @@ class MoveEffect(object):
         self.damageClass = move.damageClass
         self.targetting = move.targetting
 
-    @classmethod
-    def beginTurn(cls, field, user, target):
-        """Called at the beginning of a turn, before instantiation"""
+        if move.pp is None:
+            self.flags = self.flags.union([self.ppless])
+
+    def beginTurn(self):
+        """Called at the beginning of a turn"""
         return None
 
     def copyToUser(self, user):
@@ -86,17 +88,15 @@ class MoveEffect(object):
         return [self.attemptHit(hit) for hit in self.hits]
 
     def hits(self, **kwargs):
-        hits = []
-        for target in self.getTargets(**kwargs):
+        for target in self.targets(**kwargs):
             if self.targettable(target, **kwargs):
-                hits.append(Hit(self, target, **kwargs))
-        return hits
+                yield Hit(self, target, **kwargs)
 
-    def getTargets(self, **kwargs):
-        return self.targetting.getTargets(self.user, self.target)
+    def targets(self, **kwargs):
+        return self.targetting.targets(self, self.target)
 
     def targettable(self, target, **kwargs):
-        return not target.fainted
+        return not target.battler.fainted
 
     def attemptHit(self, hit):
         if Effect.preventHit(hit) or not self.rollAccuracy(hit):
@@ -122,13 +122,13 @@ class MoveEffect(object):
     def doDamage(self, hit):
         hit.damage = self.calculateDamage(hit)
         hit.damage = Effect.modifyMoveDamage(self, hit.damage, hit)
-        hit.target.hp -= hit.damage
+        hit.target. battler.hp -= hit.damage
         Effect.moveDamageDone(hit)
         Effect.damageDone(hit.target, hit.damage)
 
     def calculateDamage(self, hit):
         # This is too mechanic-specific to have in MoveEffect
-        return self.field.calculateMoveDamage(hit)
+        return self.field.calculateDamage(hit)
 
     def deductPP(self):
         if self.ppless not in self.flags:
