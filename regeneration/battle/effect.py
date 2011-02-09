@@ -222,6 +222,24 @@ class Effect(object):
         """
         return
 
+    @callback
+    def moveHit(self, hit):
+        """Called when a move connected with a target.
+        """
+        return
+
+    @callback
+    def moveDamageDone(self, hit):
+        """Called when a move damages a target.
+        """
+        return
+
+    @callback
+    def damageDone(self, subject, damage):
+        """Called when damage is done to battler
+        """
+        return
+
     # Cancellers
 
     @callback
@@ -232,3 +250,43 @@ class Effect(object):
         you want to do).
         """
         return False
+
+    @callback
+    def preventUse(self, moveeffect):
+        """Return true to prevent the use of a move
+
+        This includes the "X used Y" message and PP reduction.
+        """
+        return False
+
+    @callback
+    def preventHit(self, hit):
+        """Return true to prevent a move's hit
+        """
+        return False
+
+    @callback
+    def prevent_switch(self, command):
+        """Return true to prevent a switch
+        """
+        return False
+
+    # Chainers
+
+    @chain
+    def modifyAccuracy(self, hit, accuracy):
+        """Modify a hit's accuracy
+        """
+        return accuracy
+
+    @chain
+    def modifyMoveDamage(self, target, damage, hit):
+        """Modify a hit's damage
+        """
+        return damage
+
+    @chain
+    def ppReduction(self, moveeffect, pp):
+        """Modify a hit's damage
+        """
+        return pp
