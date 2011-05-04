@@ -14,38 +14,38 @@ class Loader(object):
 
         self.natures = session.query(tables.Nature).all()
 
-    @staticmethod
-    def filter(table, thing):
-        return table.id == thing
-
-    def loadForm(self, name, form=None):
+    def loadForm(self, identifier, form_identifier=None):
         query = self.session.query(tables.PokemonForm)
-        if form:
-            query = query.filter(self.filter(tables.PokemonForm, form))
-        else:
-            query = query.filter(self.filter(tables.Pokemon, name))
-            query = query.filter(
-                    tables.PokemonForm.form_base_pokemon_id ==
-                        tables.Pokemon.id
-                )
+        query = query.join(tables.PokemonForm.pokemon)
+        query = query.join(tables.Pokemon.species)
+        query = query.filter(tables.PokemonForm.form_identifier == form_identifier)
+        query = query.filter(tables.PokemonSpecies.identifier == identifier)
         return query.one()
 
-    def loadByName(self, table, name):
+    def loadByIdentifier(self, table, identifier):
         query = self.session.query(table)
-        query = query.filter(self.filter(table, name))
+        query = query.filter(table.identifier == identifier)
         return query.one()
 
-    def loadMove(self, name):
-        return self.loadByName(tables.Move, name)
+    def loadMove(self, identifier):
+        return self.loadByIdentifier(tables.Move, identifier)
 
-    def loadNature(self, name):
-        return self.loadByName(tables.Nature, name)
+    def loadNature(self, identifier):
+        return self.loadByIdentifier(tables.Nature, identifier)
 
-    def loadAbility(self, name):
-        return self.loadByName(tables.Ability, name)
+    def loadAbility(self, identifier):
+        return self.loadByIdentifier(tables.Ability, identifier)
 
-    def loadItem(self, name):
-        return self.loadByName(tables.Item, name)
+    def loadItem(self, identifier):
+        return self.loadByIdentifier(tables.Item, identifier)
+
+    def loadStruggle(self):
+        return self.loadMove('struggle')
+
+    def loadTypes(self, identifiers):
+        results = []
+        for name in names:
+            return self.loadType(identifiers)
 
 
 loader = Loader(connect())

@@ -56,9 +56,9 @@ class Monster(object):
 
         self.status = Status.ok
 
-        self.gender = Gender.Random(self.species.gender_rate, rand=rand)
+        self.gender = Gender.Random(self.species.species.gender_rate, rand=rand)
 
-        self.tameness = self.species.base_happiness
+        self.tameness = self.species.species.base_happiness
 
         self.shiny = random.randint(0, 65535) < 8
 
@@ -155,15 +155,15 @@ class Monster(object):
         """Save the monster to a dict"""
         return dict(
                 nickname=self._name,
-                species=self.species.normal_form.id,
-                form=self.form.id,
+                species=self.species.species.identifier,
+                form=self.species.default_form.form_identifier,
                 level=self.level,
                 shiny=self.shiny,
                 met='',
-                item=self.item.id if self.item else None,
+                item=self.item.identifier if self.item else None,
                 gender=self.gender.identifier,
-                nature=self.nature.id,
-                ability=self.ability.id,
+                nature=self.nature.identifier,
+                ability=self.ability.identifier,
                 genes=self.genes.save(),
                 effort=self.effort.save(),
                 tameness=self.tameness,
@@ -171,7 +171,7 @@ class Monster(object):
                 status=self.status.identifier,
                 moves=[
                         dict(
-                            kind=move.kind.id,
+                            kind=move.kind.identifier,
                             pp=move.pp
                         )
                         for move
@@ -187,7 +187,7 @@ class Monster(object):
         """
         get = dct.get
         rv = cls(
-                loader.loadForm(get('name'), get('form', None)),
+                loader.loadForm(get('species'), get('form', None)),
                 get('level', 100),
                 loader.natures,
                 rand = FakeRand(),
