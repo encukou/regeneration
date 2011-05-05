@@ -27,8 +27,8 @@ def testBattler():
     session = connect()
 
     species = session.query(tables.Form).filter_by(id=1).one()
-    bulba = monster.Monster(species, 30, loader.natures, rand=FakeRand())
-    bulba = battler.Battler(bulba, FakeSpot())
+    bulba = monster.Monster(species, 30, loader, rand=FakeRand())
+    bulba = battler.Battler(bulba, FakeSpot(), loader)
 
     assert_equal(bulba.ability.id, 65)
     bulba.ability = loader.loadAbility('stench')

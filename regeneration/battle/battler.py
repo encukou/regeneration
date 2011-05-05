@@ -6,7 +6,7 @@ from collections import namedtuple
 from functools import partial
 
 from regeneration.battle.effect import EffectSubject
-from regeneration.battle.stats import Stats, BattleStat
+from regeneration.battle.stats import Stats
 from regeneration.battle.move import Move
 
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
@@ -23,7 +23,7 @@ class Battler(EffectSubject):
     """
     forcedMove = None
 
-    def __init__(self, monster, spot):
+    def __init__(self, monster, spot, loader):
         EffectSubject.__init__(self, spot.field)
         self.monster = monster
         self.species = monster.species
@@ -31,8 +31,8 @@ class Battler(EffectSubject):
 
         self.ability = monster.ability
 
-        self.stats = monster.stats
-        self.statLevels = Stats(0, statEnum=BattleStat)
+        self.stats = Stats(monster.stats)
+        self.statLevels = Stats(loader.battleStats)
 
         self.moves = list(monster.moves)
 

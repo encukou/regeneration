@@ -3,7 +3,7 @@
 
 import random
 
-from regeneration.battle.stats import Stat, Stats
+from regeneration.battle.stats import Stats
 from regeneration.battle.enum import Enum
 from regeneration.battle.gender import Gender
 from regeneration.battle.move import Move
@@ -27,7 +27,7 @@ class Monster(object):
     If genes, effort, or nature are changed, be sure to call recalculateStats().
     """
 
-    def __init__(self, form, level, natures, rand=random, _load_moves=True):
+    def __init__(self, form, level, loader, rand=random, _load_moves=True):
         """ Create a random Monster of the given species and level.
 
         The randomness corresponds to a typical random encounter; if any fields
@@ -42,11 +42,11 @@ class Monster(object):
         self.species = form.species
         self.level = level
 
-        self.genes = Stats(0, 31, rand=rand)
-        self.effort = Stats()
-        self.stats = Stats()
+        self.genes = Stats(loader.permanentStats, 0, 31, rand=rand)
+        self.effort = Stats(loader.permanentStats)
+        self.stats = Stats(loader.permanentStats)
 
-        self.nature = rand.choice(natures)
+        self.nature = rand.choice(loader.natures)
 
         self.hp = 0
         self.recalculateStats()
@@ -80,7 +80,7 @@ class Monster(object):
 
     def recalculateStats(self):
         missingHp = self.stats.hp - self.hp
-        for stat in Stat:
+        for stat in self.genes:
             (pstat,) = (
                     pstat for pstat in self.species.stats
                     if pstat.stat.name == stat.name
@@ -90,7 +90,7 @@ class Monster(object):
             effort = self.effort[stat]
             level = self.level
             result = ((2 * base + gene + (effort // 4)) * level // 100 + 5)
-            if stat is Stat.hp:
+            if stat.identifier == 'hp':
                 result += level + 5
             else:
                 statIdentifier = stat.name.lower().replace(' ', '-')
@@ -189,7 +189,7 @@ class Monster(object):
         rv = cls(
                 loader.loadForm(get('species'), get('form', None)),
                 get('level', 100),
-                loader.natures,
+                loader,
                 rand = FakeRand(),
                 _load_moves='moves' not in dct,
             )
@@ -203,11 +203,11 @@ class Monster(object):
             rv.nature = loader.loadNature(get('nature'))
         rv.ability = loader.loadAbility(get('ability'))
         if 'genes' in dct:
-            rv.genes = Stats.load(get('genes'))
+            rv.genes = Stats.load(get('genes'), loader.permanentStats)
         else:
-            rv.genes = Stats()
+            rv.genes = Stats(loader.permanentStats)
         if 'effort' in dct:
-            rv.effort = Stats.load(get('effort'))
+            rv.effort = Stats.load(get('effort'), loader.permanentStats)
         if 'tameness' in dct:
             rv.tameness = get('tameness')
         if 'status' in dct:

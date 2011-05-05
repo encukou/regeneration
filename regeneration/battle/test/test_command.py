@@ -51,8 +51,8 @@ class TestCommand(QuietTestCase):
 
     def setUp(self):
         super(TestCommand, self).setUp()
-        self.bulba = monster.Monster(self.species, 30, loader.natures, rand=FakeRand())
-        self.battler = battler.Battler(self.bulba, FakeSpot())
+        self.bulba = monster.Monster(self.species, 30, loader, rand=FakeRand())
+        self.battler = battler.Battler(self.bulba, FakeSpot(), loader)
         self.battler.spot.battler = self.battler
 
         self.request = command.CommandRequest(self.battler.spot)
@@ -152,7 +152,7 @@ class TestCommand(QuietTestCase):
 
     @quiet
     def testNoItems(self):
-        localBattler = battler.Battler(self.bulba, FakeSpot())
+        localBattler = battler.Battler(self.bulba, FakeSpot(), loader)
         localRequest = command.CommandRequest(localBattler)
         del localBattler.spot.trainer.items
 

@@ -14,6 +14,12 @@ class Loader(object):
 
         self.natures = session.query(tables.Nature).all()
 
+        self.battleStats = session.query(tables.Stat).order_by(
+                tables.Stat.id).all()
+
+        self.permanentStats = [s for s in self.battleStats if
+                not s.is_battle_only]
+
     def loadForm(self, identifier, form_identifier=None):
         query = self.session.query(tables.PokemonForm)
         query = query.join(tables.PokemonForm.pokemon)
@@ -38,6 +44,9 @@ class Loader(object):
 
     def loadItem(self, identifier):
         return self.loadByIdentifier(tables.Item, identifier)
+
+    def loadStat(self, identifier):
+        return self.loadByIdentifier(tables.Stat, identifier)
 
     def loadStruggle(self):
         return self.loadMove('struggle')

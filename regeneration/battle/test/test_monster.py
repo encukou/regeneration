@@ -17,7 +17,7 @@ def testMonster():
     session = connect()
 
     species = session.query(tables.Form).filter_by(id=1).one()
-    bulba = monster.Monster(species, 30, loader.natures, rand=FakeRand())
+    bulba = monster.Monster(species, 30, loader, rand=FakeRand())
     assert_equal(bulba.ability.identifier, 'overgrow')
     assert_equal(bulba.gender.identifier, 'female')
     assert_equal(
@@ -43,7 +43,7 @@ def testMonster():
 
     bulba.shiny = False
     bulba.effort.hp = 100
-    bulba.genes.def_ = 3
+    bulba.genes.defense = 3
     bulba.name = 'Testcase exhibit B'
     bulba.item = loader.loadItem('fresh-water')
     bulba.gender = bulba.gender.opposite
@@ -71,7 +71,7 @@ def testMonster():
     assert_equal(monster.Monster.load(saved, loader).genes.values(), [0] * 6)
 
     species = session.query(tables.Form).filter_by(id=137).one()
-    gon = monster.Monster(species, 30, loader.natures, rand=FakeRand())
+    gon = monster.Monster(species, 30, loader, rand=FakeRand())
     assert_equal(gon.ability.identifier, 'trace')
     assert_equal(gon.gender.identifier, 'none')
 
