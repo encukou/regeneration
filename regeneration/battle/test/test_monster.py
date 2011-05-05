@@ -4,6 +4,7 @@
 from nose.tools import assert_almost_equal
 
 from regeneration.battle.test import FakeRand, quiet, assert_equal
+from regeneration.battle.gender import Gender
 from regeneration.battle.example import connect, tables, loader
 
 from regeneration.battle import monster
@@ -46,12 +47,12 @@ def testMonster():
     bulba.genes.defense = 3
     bulba.name = 'Testcase exhibit B'
     bulba.item = loader.loadItem('fresh-water')
-    bulba.gender = bulba.gender.opposite
+    bulba.gender = Gender.male
     bulba.nature = loader.natures[1]
     bulba.ability = loader.loadAbility('own-tempo')
     bulba.tameness = 0
     bulba.hp = 0
-    bulba.status = monster.Status.par
+    bulba.status = 'par'
     bulba.setMoves([loader.loadMove('petal-dance'), loader.loadMove('bind')])
     bulba.setMove(0, loader.loadMove('pound'))
     assert_equal([move.kind.identifier for move in bulba.moves], ['pound', 'bind'])

@@ -3,7 +3,6 @@
 
 from fractions import Fraction
 
-from regeneration.battle.enum import Enum
 from regeneration.battle.movetargetting import MoveTargetting
 
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'

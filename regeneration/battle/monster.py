@@ -4,7 +4,6 @@
 import random
 
 from regeneration.battle.stats import Stats
-from regeneration.battle.enum import Enum
 from regeneration.battle.gender import Gender
 from regeneration.battle.move import Move
 
@@ -54,7 +53,7 @@ class Monster(object):
 
         self._name = None
 
-        self.status = Status.ok
+        self.status = 'ok'
 
         self.gender = Gender.Random(self.species.species.gender_rate, rand=rand)
 
@@ -168,7 +167,7 @@ class Monster(object):
                 effort=self.effort.save(),
                 tameness=self.tameness,
                 hp=self.hp,
-                status=self.status.identifier,
+                status=self.status,
                 moves=[
                         dict(
                             kind=move.kind.identifier,
@@ -198,7 +197,7 @@ class Monster(object):
         rv.met = get('met', '')
         rv.item = loader.loadItem(get('item')) if get('item') else None
         if 'gender' in dct:
-            rv.gender = Gender[get('gender')]
+            rv.gender = Gender.get(get('gender'))
         if 'nature' in dct:
             rv.nature = loader.loadNature(get('nature'))
         rv.ability = loader.loadAbility(get('ability'))
@@ -211,7 +210,7 @@ class Monster(object):
         if 'tameness' in dct:
             rv.tameness = get('tameness')
         if 'status' in dct:
-            rv.status = Status[get('status')]
+            rv.status = get('status')
         if 'moves' in dct:
             rv.moves = [
                     Move(
@@ -224,11 +223,6 @@ class Monster(object):
         if 'hp' in dct:
             rv.hp = get('hp')
         return rv
-
-class Status(Enum):
-    """ An enum of status ailments """
-
-    identifiers = 'ok brn frz par psn slp fnt'.split()
 
 class FakeRand(object):
     def randint(self, a, b):

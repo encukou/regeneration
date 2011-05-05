@@ -4,8 +4,6 @@
 from contextlib import contextmanager
 from functools import wraps, partial
 
-from regeneration.battle.enum import Enum
-
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'

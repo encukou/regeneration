@@ -3,17 +3,17 @@
 
 import random
 
-from regeneration.battle.enum import Enum
-
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
-class Gender(Enum):
+class Gender(object):
     """ An enumeration of genders
     """
-    identifiers = 'none male female'.split()
-    symbols = u'–♂♀'
+    def __init__(self, identifier, symbol, value):
+        self.identifier = identifier
+        self.symbol = symbol
+        self.value = value
 
     @classmethod
     def Random(cls, gender_rate, rand=random):
@@ -25,17 +25,19 @@ class Gender(Enum):
         else:
             return cls.male
 
+    @classmethod
+    def get(self, identifier):
+        return getattr(self, identifier)
+
     def isOpposite(self, other):
-        if self.opposite and self.opposite == other:
-            return True
-        else:
-            return False
+        return self.value and self.value == -other.value
 
-for g, symbol, opposite in zip(
-        Gender,
-        Gender.symbols,
-        [None, Gender.female, Gender.male]
-    ):
-    g.symbol = symbol
-    g.opposite = opposite
+    def __str__(self):
+        return self.identifier
 
+    def __repr__(self):
+        return "<Gender: %s>" % self.identifier
+
+Gender.none = Gender('none', u'–', 0)
+Gender.male = Gender('male', u'♂', -1)
+Gender.female = Gender('female', u'♀', 1)

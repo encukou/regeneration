@@ -58,10 +58,10 @@ def testBattler():
     assert bulba.fainted
     assert bulba.monster.fainted
 
-    assert bulba.status == monster.Status.ok
-    bulba.status = monster.Status.par
-    assert bulba.status == monster.Status.par
-    assert bulba.monster.status == monster.Status.par
+    assert bulba.status == 'ok'
+    bulba.status = 'par'
+    assert bulba.status == 'par'
+    assert bulba.monster.status == 'par'
 
     assert_equal(bulba.item, None)
     bulba.item = loader.loadItem('fresh-water')
