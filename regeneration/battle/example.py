@@ -1,6 +1,8 @@
 #! /usr/bin/python
 # Encoding: UTF-8
 
+import weakref
+
 # For an example, we can use veekun's pokedex database.
 from pokedex.db import tables, connect
 
@@ -9,6 +11,8 @@ __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
 class Loader(object):
+    _identifier_cache = weakref.WeakValueDictionary()
+
     def __init__(self, session):
         self.session = session
 
@@ -29,9 +33,15 @@ class Loader(object):
         return query.one()
 
     def loadByIdentifier(self, table, identifier):
-        query = self.session.query(table)
-        query = query.filter(table.identifier == identifier)
-        return query.one()
+        key = self.session, table, identifier
+        try:
+            return self._identifier_cache[key]
+        except KeyError:
+            query = self.session.query(table)
+            query = query.filter(table.identifier == identifier)
+            result = query.one()
+            self._identifier_cache[key] = result
+            return result
 
     def loadMove(self, identifier):
         return self.loadByIdentifier(tables.Move, identifier)
