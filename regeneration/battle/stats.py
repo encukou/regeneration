@@ -13,7 +13,7 @@ class Stats(dict):
     Besides the special __init__, it also allows attribute access to the stats,
     and saving/loading to/from a simple dict.
     """
-    def __init__(self, statObjects, min=0, max=None, rand=random):
+    def __init__(self, stat_objects, min=0, max=None, rand=random):
         """Create a new set of stats
 
         If statObjects is a dict-like object, stats will get copied from it.
@@ -24,37 +24,37 @@ class Stats(dict):
         Otherwise, they will all get set to min, or 0 by default.
         """
         try:
-            dict.__init__(self, statObjects)
+            dict.__init__(self, stat_objects)
         except TypeError:
-            self._statObjects = statObjects
-            for stat in statObjects:
+            self._stat_objects = stat_objects
+            for stat in stat_objects:
                 if max is None:
                     self[stat] = min
                 else:
                     self[stat] = rand.randint(min, max)
 
-    def _statByIdentifier(self, identifier):
-        return [s for s in self._statObjects if s.identifier == identifier][0]
+    def _stat_by_identifier(self, identifier):
+        return [s for s in self._stat_objects if s.identifier == identifier][0]
 
     def __getattr__(self, attr):
-        return self[self._statByIdentifier(attr)]
+        return self[self._stat_by_identifier(attr)]
 
     def __setattr__(self, attr, value):
         if attr[0] == '_':
             super(Stats, self).__setattr__(attr, value)
         else:
-            self[self._statByIdentifier(attr)] = value
+            self[self._stat_by_identifier(attr)] = value
 
     def __str__(self):
         return "<Stats: {%s}>".format(", ".join("%s: %s" %
-                (s.identifier, self[s]) for s in self._statObjects))
+                (s.identifier, self[s]) for s in self._stat_objects))
 
     def save(self):
         return dict((k.identifier, v) for k, v in self.items())
 
     @classmethod
-    def load(cls, dct, statObjects):
-        loaded = cls(statObjects)
+    def load(cls, dct, stat_objects):
+        loaded = cls(stat_objects)
         for identifier, value in dct.items():
             setattr(loaded, identifier, value)
         return loaded

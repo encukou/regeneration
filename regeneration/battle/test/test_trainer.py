@@ -34,7 +34,7 @@ class TestTrainer(QuietTestCase):
 
         self.move = Object()
         self.move.targetting = Object()
-        self.move.targetting.chooseList = lambda u, b: ['c', 'd']
+        self.move.targetting.choice_list = lambda u, b: ['c', 'd']
 
         self.request = Object()
         self.request.commands = lambda: [
@@ -43,62 +43,62 @@ class TestTrainer(QuietTestCase):
         self.request.battler = Object()
         self.request.field = Object()
         self.request.field.battlers = [self.request.battler]
-        self.request.field.commandAllowed = lambda command: True
+        self.request.field.command_allowed = lambda command: True
 
-    def checkMoveResult(self, result, command='move', target='c'):
+    def check_move_result(self, result, command='move', target='c'):
         assert_equal(result.command, command)
         assert_equal(result.move, self.move)
         assert_equal(result.target, target)
 
-    def testTrainer(self):
-        result = self.trainer.requestCommand(self.request)
-        self.checkMoveResult(result)
+    def test_trainer(self):
+        result = self.trainer.request_command(self.request)
+        self.check_move_result(result, target=None)
 
-    def testOneTarget(self):
-        self.move.targetting.chooseList = lambda u, b: ['e']
-        result = self.trainer.requestCommand(self.request)
-        self.checkMoveResult(result, target='e')
+    def test_one_target(self):
+        self.move.targetting.choice_list = lambda u, b: ['e']
+        result = self.trainer.request_command(self.request)
+        self.check_move_result(result, target='e')
 
-    def testNoTarget(self):
-        self.move.targetting.chooseList = lambda u, b: []
-        result = self.trainer.requestCommand(self.request)
-        self.checkMoveResult(result, target=None)
+    def test_no_target(self):
+        self.move.targetting.choice_list = lambda u, b: []
+        result = self.trainer.request_command(self.request)
+        self.check_move_result(result, target=None)
 
     @raises(AssertionError)
-    def testNoCommand(self):
+    def test_no_command(self):
         self.request.commands = lambda: []
-        result = self.trainer.requestCommand(self.request)
+        result = self.trainer.request_command(self.request)
 
-    def testFirstInactive(self):
-        assert_equal(self.trainer.getFirstInactiveMonster([]), self.mon1)
+    def test_first_inactive(self):
+        assert_equal(self.trainer.get_first_inactive_monster([]), self.mon1)
         assert_equal(
-                self.trainer.getFirstInactiveMonster([self.mon1]),
+                self.trainer.get_first_inactive_monster([self.mon1]),
                 self.mon2,
             )
         assert_equal(
-                self.trainer.getFirstInactiveMonster([self.mon1, self.mon2]),
+                self.trainer.get_first_inactive_monster([self.mon1, self.mon2]),
                 None,
             )
 
-    def testExclusionInactive(self):
+    def test_exclusion_inactive(self):
         exclude = []
-        assert_equal(self.trainer.getFirstInactiveMonster(exclude), self.mon1)
-        assert_equal(self.trainer.getFirstInactiveMonster(exclude), self.mon2)
-        assert_equal(self.trainer.getFirstInactiveMonster(exclude), None)
+        assert_equal(self.trainer.get_first_inactive_monster(exclude), self.mon1)
+        assert_equal(self.trainer.get_first_inactive_monster(exclude), self.mon2)
+        assert_equal(self.trainer.get_first_inactive_monster(exclude), None)
 
-    def testRandomInactive(self):
-        assert_equal(self.trainer.getRandomInactiveMonster([]), self.mon2)
+    def test_random_inactive(self):
+        assert_equal(self.trainer.get_random_inactive_monster([]), self.mon2)
         assert_equal(
-                self.trainer.getRandomInactiveMonster([self.mon1]),
+                self.trainer.get_random_inactive_monster([self.mon1]),
                 self.mon2,
             )
         assert_equal(
-                self.trainer.getRandomInactiveMonster([self.mon1, self.mon2]),
+                self.trainer.get_random_inactive_monster([self.mon1, self.mon2]),
                 None,
             )
 
-    def testExclusionRandom(self):
+    def test_exclusion_random(self):
         exclude = []
-        assert_equal(self.trainer.getRandomInactiveMonster(exclude), self.mon2)
-        assert_equal(self.trainer.getRandomInactiveMonster(exclude), self.mon1)
-        assert_equal(self.trainer.getRandomInactiveMonster(exclude), None)
+        assert_equal(self.trainer.get_random_inactive_monster(exclude), self.mon2)
+        assert_equal(self.trainer.get_random_inactive_monster(exclude), self.mon1)
+        assert_equal(self.trainer.get_random_inactive_monster(exclude), None)

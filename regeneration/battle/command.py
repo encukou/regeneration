@@ -19,7 +19,7 @@ class Command(object):
         self.request = request
 
     def select(self):
-        self.field.commandSelected(self)
+        self.field.command_selected(self)
 
     @property
     def field(self):
@@ -31,7 +31,7 @@ class Command(object):
 
     @property
     def allowed(self):
-        return self.field.commandAllowed(self)
+        return self.field.command_allowed(self)
 
     def __eq__(self, other):
         return self.command == other.command and self.args == other.args
@@ -47,8 +47,8 @@ class MoveCommand(Command):
         self.target = target
 
     @property
-    def possibleTargets(self):
-        return self.move.targetting.chooseList(
+    def possible_targets(self):
+        return self.move.targetting.choice_list(
                 self.request.battler,
                 self.field.battlers,
             )
@@ -86,7 +86,7 @@ class RunCommand(Command):
     def args(self):
         return ()
 
-def iterIfAllowed(func):
+def filter_allowed(func):
     def inner(self, *args, **kwargs):
         for command in func(self, *args, **kwargs):
             if command.allowed:
@@ -109,19 +109,19 @@ class CommandRequest(object):
             return
         if moves is None:
             moves = self.battler.moves
-        haveSomeMoves = False
+        have_some_moves = False
         for move in moves:
             command = MoveCommand(self, move=move)
             if command.allowed:
-                haveSomeMoves = True
+                have_some_moves = True
                 yield command
-        if haveSomeMoves:
+        if have_some_moves:
             return
         # Struggle
         struggle = Move(self.field.struggle)
         yield MoveCommand(self, move=struggle)
 
-    @iterIfAllowed
+    @filter_allowed
     def switches(self, replacements=None):
         if replacements is None:
             replacements = self.spot.trainer.team
@@ -129,7 +129,7 @@ class CommandRequest(object):
             if not replacement.fainted:
                 yield SwitchCommand(self, replacement=replacement)
 
-    @iterIfAllowed
+    @filter_allowed
     def items(self, items=None):
         if items is None:
             try:
@@ -140,11 +140,11 @@ class CommandRequest(object):
         for item in items:
             yield ItemCommand(self, item=item)
 
-    @iterIfAllowed
+    @filter_allowed
     def forfeits(self):
         yield RunCommand(self)
 
-    @iterIfAllowed
+    @filter_allowed
     def commands(self, moves=None, replacements=None, items=None):
         for command in itertools.chain(
                 self.moves(moves),

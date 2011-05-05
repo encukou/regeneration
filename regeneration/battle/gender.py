@@ -16,7 +16,7 @@ class Gender(object):
         self.value = value
 
     @classmethod
-    def Random(cls, gender_rate, rand=random):
+    def random(cls, gender_rate, rand=random):
         if gender_rate == -1:
             # Ditto & Genderless
             return cls.none
@@ -29,7 +29,7 @@ class Gender(object):
     def get(self, identifier):
         return getattr(self, identifier)
 
-    def isOpposite(self, other):
+    def is_opposite(self, other):
         return self.value and self.value == -other.value
 
     def __str__(self):

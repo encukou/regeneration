@@ -16,29 +16,29 @@ class Trainer(object):
         self.team = team
         self.rand = rand
 
-    def requestCommand(self, request):
+    def request_command(self, request):
         """Process CommandRequest: either return a Command or select() one later
 
         The base class implementation is geared towards simple AI trainers,
         which should implement getCommand.
         Human-played trainers should reimplement requestCommand itself.
         """
-        chain = itertools.chain(self.getCommands(request), request.commands())
+        chain = itertools.chain(self.get_commands(request), request.commands())
         for command in chain:
             if command.allowed:
                 if command.command == 'move' and not command.target:
-                    possibleTargets = command.possibleTargets
-                    if len(possibleTargets) == 0:
+                    possible_targets = command.possible_targets
+                    if len(possible_targets) == 0:
                         target = None
-                    elif len(possibleTargets) == 1:
-                        target = possibleTargets[0]
+                    elif len(possible_targets) == 1:
+                        target = possible_targets[0]
                     else:
-                        target = self.chooseTarget(command)
+                        target = self.choose_target(command)
                     command.target = target
                 return command
         raise AssertionError("No commands available!")
 
-    def getCommands(self, request):
+    def get_commands(self, request):
         """Yield commands in order of preference.
 
         The first allowed one is used by requestCommand.
@@ -48,7 +48,7 @@ class Trainer(object):
         """
         return ()
 
-    def getFirstInactiveMonster(self, exclude):
+    def get_first_inactive_monster(self, exclude):
         """Return the first conscious team member that is not in exclude.
 
         The returned value is added to exclude, so that it is not selected
@@ -59,7 +59,7 @@ class Trainer(object):
                 exclude.append(monster)
                 return monster
 
-    def getRandomInactiveMonster(self, exclude):
+    def get_random_inactive_monster(self, exclude):
         """Return a random conscious team member that is not in exclude.
 
         The returned value is added to exclude, so that it is not selected
@@ -72,16 +72,16 @@ class Trainer(object):
                 exclude.append(monster)
                 return monster
 
-    def chooseTarget(self, command):
+    def choose_target(self, command):
         """Choose a target for a command. Similar to requestCommand.
         """
         for target in itertools.chain(
-                self.getTargets(command),
+                self.get_targets(command),
                 command.possibleTargets,
             ):
             return target
 
-    def getTargets(self, command):
+    def get_targets(self, command):
         """Yield targets in order of preference. Similar to getCommands.
         """
         return ()

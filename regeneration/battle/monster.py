@@ -42,28 +42,28 @@ class Monster(object):
         self.species = form.species
         self.level = level
 
-        self.genes = Stats(loader.permanentStats, 0, 31, rand=rand)
-        self.effort = Stats(loader.permanentStats)
-        self.stats = Stats(loader.permanentStats)
+        self.genes = Stats(loader.permanent_stats, 0, 31, rand=rand)
+        self.effort = Stats(loader.permanent_stats)
+        self.stats = Stats(loader.permanent_stats)
 
         self.nature = rand.choice(loader.natures)
 
         self.hp = 0
-        self.recalculateStats()
+        self.recalculate_stats()
         self.hp = self.stats.hp
 
         self._name = None
 
         self.status = 'ok'
 
-        self.gender = Gender.Random(self.species.gender_rate, rand=rand)
+        self.gender = Gender.random(self.species.gender_rate, rand=rand)
 
         self.tameness = self.species.base_happiness
 
         self.shiny = random.randint(0, 65535) < 8
 
         if _load_moves:
-            self.setMoves(self._wildMovesAtLevel(level))
+            self.set_moves(self._wild_moves_at_level(level))
 
         try:
             self.item = rand.choice(self.kind.items).item
@@ -72,14 +72,14 @@ class Monster(object):
 
         self.ability = rand.choice(self.kind.abilities)
 
-    def setMoves(self, kinds):
+    def set_moves(self, kinds):
         self.moves = [Move(kind) for kind in kinds]
 
-    def setMove(self, i, kind):
+    def set_move(self, i, kind):
         self.moves[i] = Move(kind)
 
-    def recalculateStats(self):
-        missingHp = self.stats.hp - self.hp
+    def recalculate_stats(self):
+        missing_hp = self.stats.hp - self.hp
         for stat in self.genes:
             (pstat,) = (
                     pstat for pstat in self.kind.stats
@@ -93,18 +93,18 @@ class Monster(object):
             if stat.identifier == 'hp':
                 result += level + 5
             else:
-                statIdentifier = stat.name.lower().replace(' ', '-')
+                stat_identifier = stat.name.lower().replace(' ', '-')
                 if self.nature.increased_stat is pstat.stat:
                     result = int(result * 1.1)
                 elif self.nature.decreased_stat is pstat.stat:
                     result = int(result * 0.9)
             self.stats[stat] = result
-        self.hp = self.stats.hp - missingHp
+        self.hp = self.stats.hp - missing_hp
         if self.hp < 0:
             self.hp = 0
 
-    def rename(self, newName):
-        self._name = newName
+    def rename(self, new_name):
+        self._name = new_name
 
     name = property(
             fget=lambda self: self._name or self.species.name,
@@ -128,7 +128,7 @@ class Monster(object):
     def fainted(self):
         return self.hp <= 0
 
-    def _wildMovesAtLevel(self, level):
+    def _wild_moves_at_level(self, level):
         # XXX: This could be sped up if some magic is used so the underlying
         # query can be accessed => searching in SQL directly. Worth it?
         movelist = list(x for x
@@ -187,7 +187,7 @@ class Monster(object):
         """
         get = dct.get
         rv = cls(
-                loader.loadForm(get('species'), get('form', None)),
+                loader.load_form(get('species'), get('form', None)),
                 get('level', 100),
                 loader,
                 rand = FakeRand(),
@@ -196,18 +196,18 @@ class Monster(object):
         rv.name = get('nickname', None)
         rv.shiny = get('shiny', False)
         rv.met = get('met', '')
-        rv.item = loader.loadItem(get('item')) if get('item') else None
+        rv.item = loader.load_item(get('item')) if get('item') else None
         if 'gender' in dct:
             rv.gender = Gender.get(get('gender'))
         if 'nature' in dct:
-            rv.nature = loader.loadNature(get('nature'))
-        rv.ability = loader.loadAbility(get('ability'))
+            rv.nature = loader.load_nature(get('nature'))
+        rv.ability = loader.load_ability(get('ability'))
         if 'genes' in dct:
-            rv.genes = Stats.load(get('genes'), loader.permanentStats)
+            rv.genes = Stats.load(get('genes'), loader.permanent_stats)
         else:
-            rv.genes = Stats(loader.permanentStats)
+            rv.genes = Stats(loader.permanent_stats)
         if 'effort' in dct:
-            rv.effort = Stats.load(get('effort'), loader.permanentStats)
+            rv.effort = Stats.load(get('effort'), loader.permanent_stats)
         if 'tameness' in dct:
             rv.tameness = get('tameness')
         if 'status' in dct:
@@ -215,12 +215,12 @@ class Monster(object):
         if 'moves' in dct:
             rv.moves = [
                     Move(
-                        loader.loadMove(move_info['kind']),
+                        loader.load_move(move_info['kind']),
                         move_info.get('pp', None),
                     )
                     for move_info in get('moves')
                 ]
-        rv.recalculateStats()
+        rv.recalculate_stats()
         if 'hp' in dct:
             rv.hp = get('hp')
         return rv

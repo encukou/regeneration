@@ -18,13 +18,13 @@ class Loader(object):
 
         self.natures = session.query(tables.Nature).all()
 
-        self.battleStats = session.query(tables.Stat).order_by(
+        self.battle_stats = session.query(tables.Stat).order_by(
                 tables.Stat.id).all()
 
-        self.permanentStats = [s for s in self.battleStats if
+        self.permanent_stats = [s for s in self.battle_stats if
                 not s.is_battle_only]
 
-    def loadForm(self, identifier, form_identifier=None):
+    def load_form(self, identifier, form_identifier=None):
         query = self.session.query(tables.PokemonForm)
         query = query.join(tables.PokemonForm.pokemon)
         query = query.join(tables.Pokemon.species)
@@ -32,7 +32,7 @@ class Loader(object):
         query = query.filter(tables.PokemonSpecies.identifier == identifier)
         return query.one()
 
-    def loadByIdentifier(self, table, identifier):
+    def load_by_identifier(self, table, identifier):
         key = self.session, table, identifier
         try:
             return self._identifier_cache[key]
@@ -43,28 +43,28 @@ class Loader(object):
             self._identifier_cache[key] = result
             return result
 
-    def loadMove(self, identifier):
-        return self.loadByIdentifier(tables.Move, identifier)
+    def load_move(self, identifier):
+        return self.load_by_identifier(tables.Move, identifier)
 
-    def loadNature(self, identifier):
-        return self.loadByIdentifier(tables.Nature, identifier)
+    def load_nature(self, identifier):
+        return self.load_by_identifier(tables.Nature, identifier)
 
-    def loadAbility(self, identifier):
-        return self.loadByIdentifier(tables.Ability, identifier)
+    def load_ability(self, identifier):
+        return self.load_by_identifier(tables.Ability, identifier)
 
-    def loadItem(self, identifier):
-        return self.loadByIdentifier(tables.Item, identifier)
+    def load_item(self, identifier):
+        return self.load_by_identifier(tables.Item, identifier)
 
-    def loadStat(self, identifier):
-        return self.loadByIdentifier(tables.Stat, identifier)
+    def load_stat(self, identifier):
+        return self.load_by_identifier(tables.Stat, identifier)
 
-    def loadStruggle(self):
-        return self.loadMove('struggle')
+    def load_struggle(self):
+        return self.load_move('struggle')
 
-    def loadTypes(self, identifiers):
+    def load_types(self, identifiers):
         results = []
         for name in names:
-            return self.loadType(identifiers)
+            return self.load_type(identifiers)
 
 
 loader = Loader(connect())

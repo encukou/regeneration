@@ -15,9 +15,9 @@ class EffectSubject(object):
         self.effects = []
         self.field = field
 
-    activeSubSubjects = ()
+    active_subsubjects = ()
 
-    def applyEffect(self, effect, inducer):
+    def apply_effect(self, effect, inducer):
         """Apply an Effect to this subject.
 
         Returns the effect, or None on failure
@@ -28,41 +28,41 @@ class EffectSubject(object):
         effect.field = self.field
         effect.inducer = inducer
         effect.active = True
-        uniqueClass = effect.uniqueClass
-        if uniqueClass and self.getEffect(uniqueClass):
+        unique_class = effect.unique_class
+        if unique_class and self.get_effect(unique_class):
             return None
-        if effect.blockApplication(effect):
+        if effect.block_application(effect):
             return None
-        if Effect.blockApplication(effect):
+        if Effect.block_application(effect):
             return None
         self.effects.append(effect)
-        for e in self.field.activeEffects:
-            e.effectApplied(effect)
+        for e in self.field.active_effects:
+            e.effect_applied(effect)
         return effect
 
-    def giveEffect(self, target, effect):
+    def give_effect(self, target, effect):
         """Apply an effect to a given target, with this as the inducer
         """
-        return target.applyEffect(effect, inducer=self)
+        return target.apply_effect(effect, inducer=self)
 
-    def giveEffectSelf(self, effect):
+    def give_effect_self(self, effect):
         """Apply an effect to this subject, making it the inducer also
         """
-        return self.applyEffect(effect, inducer=self)
+        return self.apply_effect(effect, inducer=self)
 
-    def getEffects(self, effectClass=None):
+    def get_effects(self, effect_class=None):
         """Yield all effects of the given class.
 
         effectClass may be a base class or a tuple of classes, as with
         isinstance().
         """
-        if effectClass is None:
-            effectClass = object
+        if effect_class is None:
+            effect_class = object
         for effect in self.effects:
-            if isinstance(effect, effectClass) and effect.active:
+            if isinstance(effect, effect_class) and effect.active:
                 yield effect
 
-    def getEffect(self, effectClass=None):
+    def get_effect(self, effect_class=None):
         """Get an effect of the given class.
 
         If there are multiple effects, return the first one; if there are none,
@@ -71,36 +71,36 @@ class EffectSubject(object):
         effectClass may be a base class or a tuple of classes, as with
         isinstance().
         """
-        for effect in self.getEffects(effectClass):
+        for effect in self.get_effects(effect_class):
             return effect
         else:
             return None
 
     @property
-    def activeEffects(self):
+    def active_effects(self):
         for effect in self.effects[:]:
             if effect.active:
                 yield effect
-        for subSubject in self.activeSubSubjects:
-            for effect in subSubject.activeEffects:
+        for subsubject in self.active_subsubjects:
+            for effect in subsubject.active_effects:
                 yield effect
 
-    def getEffectMethods(self, cls, attr):
+    def get_effect_methods(self, cls, attr):
         """Yields an attribute for all active effects of a given class.
         """
-        for effect in self.activeEffects:
+        for effect in self.active_effects:
             if cls is None or isinstance(effect, cls):
                 yield getattr(effect, attr)
 
-def uniqueEffect(cls):
+def unique_effect(cls):
     """Decorator for unique effects; only one instance of such a class
     is allowed on a single subject. These may be singletons (e.g. infatuation),
     or exclusive classes (like the fixed status effects).
     """
-    cls.uniqueClass = cls
+    cls.unique_class = cls
     return cls
 
-def returnList(func):
+def return_list(func):
     @wraps(func)
     def wrapped(*args, **kwargs):
         return list(func(*args, **kwargs))
@@ -123,14 +123,14 @@ class callback(object):
         if instance:
             return partial(self.func, instance)
         else:
-            return wraps(self.func)(partial(self.runAll, owner))
+            return wraps(self.func)(partial(self.run_all, owner))
 
-    def getEffectMethods(self, owner, object):
-        return object.field.getEffectMethods(owner, self.name)
+    def get_effect_methods(self, owner, object):
+        return object.field.get_effect_methods(owner, self.name)
 
-    @returnList
-    def runAll(self, owner, object, *args, **kwargs):
-        for method in self.getEffectMethods(owner, object):
+    @return_list
+    def run_all(self, owner, object, *args, **kwargs):
+        for method in self.get_effect_methods(owner, object):
             value = method(object, *args, **kwargs)
             if value:
                 yield value
@@ -142,8 +142,8 @@ class chain(callback):
     argument to the next, and the last one is returned.
     """
 
-    def runAll(self, owner, object, value, *args, **kwargs):
-        for method in self.getEffectMethods(owner, object):
+    def run_all(self, owner, object, value, *args, **kwargs):
+        for method in self.get_effect_methods(owner, object):
             value = method(object, value, *args, **kwargs)
         return value
 
@@ -162,7 +162,7 @@ class Effect(object):
 
     Always apply effects using effectSubject methods (giveEffect etc.).
     """
-    uniqueClass = None
+    unique_class = None
 
     active = False
 
@@ -170,7 +170,7 @@ class Effect(object):
         """Always call EffectSubject's methods to properly apply Effects!
         """
 
-    def reparent(self, newSubject):
+    def reparent(self, new_subject):
         """Move the effect onto another subject.
         This is only for quick hacks, and generally shouldn't be used.
         """
@@ -179,11 +179,11 @@ class Effect(object):
                 in self.subject.effects
                 if e is not self
             ]
-        self.subject = newSubject
+        self.subject = new_subject
         self.subject.effects.append(self)
 
     def remove(self):
-        Effect.effectRemoved(self)
+        Effect.effect_removed(self)
         self.active = False
         self.subject.effects = [
                 e for e
@@ -209,37 +209,37 @@ class Effect(object):
     # Notifications
 
     @callback
-    def effectRemoved(self, effect):
+    def effect_removed(self, effect):
         """Called when this effect is removed.
         """
         return
 
     @callback
-    def effectApplied(self, effect):
+    def effect_applied(self, effect):
         """Called when some effect has been applied.
         """
         return
 
     @callback
-    def moveHit(self, hit):
+    def move_hit(self, hit):
         """Called when a move connected with a target.
         """
         return
 
     @callback
-    def moveDamageDone(self, hit):
+    def move_damage_done(self, hit):
         """Called when a move damages a target.
         """
         return
 
     @callback
-    def damageDone(self, subject, damage):
+    def damage_done(self, subject, damage):
         """Called when damage is done to battler
         """
         return
 
     @callback
-    def beginTurn(self, turnNumber):
+    def begin_turn(self, turn_number):
         """Called when a turn begins
         """
         return
@@ -247,7 +247,7 @@ class Effect(object):
     # Cancellers
 
     @callback
-    def blockApplication(self, effect):
+    def block_application(self, effect):
         """Called when the effect is applied; return a modified effect, or None
 
         None cancels the application(return the original effect if that's what
@@ -256,13 +256,13 @@ class Effect(object):
         return False
 
     @callback
-    def preventMoveSelection(self, command):
+    def prevent_move_selection(self, command):
         """Return true to prevent the selection of a move
         """
         return False
 
     @callback
-    def preventUse(self, moveeffect):
+    def prevent_use(self, move_effect):
         """Return true to prevent the use of a move
 
         This includes the "X used Y" message and PP reduction.
@@ -270,7 +270,7 @@ class Effect(object):
         return False
 
     @callback
-    def preventHit(self, hit):
+    def prevent_hit(self, hit):
         """Return true to prevent a move's hit
         """
         return False
@@ -284,25 +284,25 @@ class Effect(object):
     # Chainers
 
     @chain
-    def modifyAccuracy(self, hit, accuracy):
+    def modify_accuracy(self, hit, accuracy):
         """Modify a hit's accuracy
         """
         return accuracy
 
     @chain
-    def modifyMoveDamage(self, target, damage, hit):
+    def modify_move_damage(self, target, damage, hit):
         """Modify a hit's damage
         """
         return damage
 
     @chain
-    def ppReduction(self, moveeffect, pp):
-        """Modify a hit's damage
+    def pp_reduction(self, moveeffect, pp_reduction):
+        """Modify a hit's PP usage
         """
-        return pp
+        return pp_reduction
 
     @chain
-    def speedFactor(self, field, speedFactor):
+    def speed_factor(self, field, speed_factor):
         """Modify the global speed factor
         """
         return speedFactor

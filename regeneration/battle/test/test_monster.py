@@ -14,7 +14,7 @@ __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
 @quiet
-def testMonster():
+def test_monster():
     session = connect()
 
     species = session.query(FormTable).filter_by(id=1).one()
@@ -46,25 +46,25 @@ def testMonster():
     bulba.effort.hp = 100
     bulba.genes.defense = 3
     bulba.name = 'Testcase exhibit B'
-    bulba.item = loader.loadItem('fresh-water')
+    bulba.item = loader.load_item('fresh-water')
     bulba.gender = Gender.male
     bulba.nature = loader.natures[1]
-    bulba.ability = loader.loadAbility('own-tempo')
+    bulba.ability = loader.load_ability('own-tempo')
     bulba.tameness = 0
     bulba.hp = 0
     bulba.status = 'par'
-    bulba.setMoves([loader.loadMove('petal-dance'), loader.loadMove('bind')])
-    bulba.setMove(0, loader.loadMove('pound'))
+    bulba.set_moves([loader.load_move('petal-dance'), loader.load_move('bind')])
+    bulba.set_move(0, loader.load_move('pound'))
     assert_equal([move.kind.identifier for move in bulba.moves], ['pound', 'bind'])
     assert bulba.fainted
-    bulba.recalculateStats()
+    bulba.recalculate_stats()
 
     roundtrip(bulba)
 
     bulba.hp = 2
     bulba.effort.hp = 0
     bulba.level = 5
-    bulba.recalculateStats()
+    bulba.recalculate_stats()
     assert_equal(bulba.hp, 0)
 
     saved = bulba.save()
@@ -77,9 +77,9 @@ def testMonster():
     assert_equal(gon.gender.identifier, 'none')
 
 @quiet
-def testLoader():
-    assert loader.loadForm('hypno').species.identifier == 'hypno'
-    assert loader.loadMove('gust').identifier == 'gust'
-    assert loader.loadNature('brave').identifier == 'brave'
-    assert loader.loadAbility('minus').identifier == 'minus'
-    assert loader.loadItem('stick').identifier == 'stick'
+def test_loader():
+    assert loader.load_form('hypno').species.identifier == 'hypno'
+    assert loader.load_move('gust').identifier == 'gust'
+    assert loader.load_nature('brave').identifier == 'brave'
+    assert loader.load_ability('minus').identifier == 'minus'
+    assert loader.load_item('stick').identifier == 'stick'

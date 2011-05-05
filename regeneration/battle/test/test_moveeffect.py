@@ -15,7 +15,7 @@ __copyright__ = 'Copyright 2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
-someFlags = set('spam eggs'.split())
+some_flags = set('spam eggs'.split())
 
 class Object(object):
     pass
@@ -26,45 +26,45 @@ class EffectSubclass(effect.Effect):
 class FakeField(effect.EffectSubject):
     def __init__(self):
         effect.EffectSubject.__init__(self, self)
-        self.giveEffectSelf(EffectSubclass())  # for coverage
+        self.give_effect_self(EffectSubclass())  # for coverage
 
-    def flipCoin(self, chance, blurb):
+    def flip_coin(self, chance, blurb):
         return True
 
-    def calculateDamage(self, hit):
+    def calculate_damage(self, hit):
         return hit.power / 2
 
 class TestMoveEffectFlags(QuietTestCase):
-    def testFlagsDict(self):
+    def test_flags_dict(self):
         class SomeEffect(moveeffect.MoveEffect):
-            flags = dict.fromkeys(someFlags, True)
+            flags = dict.fromkeys(some_flags, True)
 
-        assert_equal(SomeEffect.flags, someFlags)
+        assert_equal(SomeEffect.flags, some_flags)
 
-    def testFlagsSet(self):
+    def test_flags_set(self):
         class SomeEffect(moveeffect.MoveEffect):
-            flags = someFlags
+            flags = some_flags
 
-        assert_equal(SomeEffect.flags, someFlags)
+        assert_equal(SomeEffect.flags, some_flags)
 
-    def testFlagsList(self):
+    def test_flags_list(self):
         class SomeEffect(moveeffect.MoveEffect):
-            flags = list(someFlags)
+            flags = list(some_flags)
 
-        assert_equal(SomeEffect.flags, someFlags)
+        assert_equal(SomeEffect.flags, some_flags)
 
-    def testInherit(self):
+    def test_inherit(self):
         class SomeEffect(moveeffect.MoveEffect):
-            flags = someFlags
+            flags = some_flags
 
         class SomeOtherEffect(SomeEffect):
             flags = ['ham']
 
-        assert_equal(SomeOtherEffect.flags, set(['ham']) | someFlags)
+        assert_equal(SomeOtherEffect.flags, set(['ham']) | some_flags)
 
-    def testUnset(self):
+    def test_unset(self):
         class SomeEffect(moveeffect.MoveEffect):
-            flags = someFlags
+            flags = some_flags
 
         class SomeOtherEffect(SomeEffect):
             flags = dict(spam=False)
@@ -72,7 +72,7 @@ class TestMoveEffectFlags(QuietTestCase):
         assert_equal(SomeOtherEffect.flags, set(['eggs']))
 
 @quiet
-def testMoveFlag():
+def test_nove_flag():
     assert_equal(str(moveeffect.MoveEffect.ppless), 'ppless')
     assert('move flag' in str(moveeffect.Flag()))
 
@@ -85,7 +85,7 @@ class TestMoveEffect(QuietTestCase):
         self.move.power = 20
         self.move.type = Object()
         self.move.accuracy = 0.5
-        self.move.damageClass = Object()
+        self.move.damage_class = Object()
         self.move.targetting = Object()
         self.move.targetting.targets = lambda u, t: [t]
         self.move.pp = 5
@@ -109,55 +109,55 @@ class TestMoveEffect(QuietTestCase):
                 target=self.target,
             )
 
-    def assertChanges(self, hp=40, pp=5):
+    def assert_changes(self, hp=40, pp=5):
         assert_equal(self.target.battler.hp, hp)
         assert_equal(self.move.pp, pp)
 
-    def testMoveEffect(self):
-        self.moveeffect.beginTurn()
-        (hit, ) = self.moveeffect.attemptUse()
+    def test_move_effect(self):
+        self.moveeffect.begin_turn()
+        (hit, ) = self.moveeffect.attempt_use()
         assert_equal(hit.damage, 10)
-        self.assertChanges(hp=30, pp=4)
+        self.assert_changes(hp=30, pp=4)
 
-    def testCopyToUser(self):
-        me = self.moveeffect.copyToUser(self.user)
-        me.beginTurn()
-        (hit, ) = me.attemptUse()
+    def test_copy_to_user(self):
+        me = self.moveeffect.copy_to_user(self.user)
+        me.begin_turn()
+        (hit, ) = me.attempt_use()
         assert_equal(hit.damage, 10)
-        self.assertChanges(hp=30, pp=4)
+        self.assert_changes(hp=30, pp=4)
 
-    def testPreventUse(self):
+    def test_prevent_use(self):
         effect = EffectSubclass()
-        effect.preventUse = lambda moveeffect: True
-        self.field.giveEffectSelf(effect)
-        assert_equal(self.moveeffect.attemptUse(), None)
-        self.assertChanges()
+        effect.prevent_use = lambda moveeffect: True
+        self.field.give_effect_self(effect)
+        assert_equal(self.moveeffect.attempt_use(), None)
+        self.assert_changes()
 
-    def testPreventHit(self):
+    def test_prevent_hit(self):
         effect = EffectSubclass()
-        effect.preventHit = lambda hit: True
-        self.field.giveEffectSelf(effect)
-        assert_equal(self.moveeffect.attemptUse(), [None])
-        self.assertChanges(pp=4)
+        effect.prevent_hit = lambda hit: True
+        self.field.give_effect_self(effect)
+        assert_equal(self.moveeffect.attempt_use(), [None])
+        self.assert_changes(pp=4)
 
-    def testMiss(self):
-        self.field.flipCoin = lambda prob, blurb: False
-        assert_equal(self.moveeffect.attemptUse(), [None])
-        self.assertChanges(pp=4)
+    def test_miss(self):
+        self.field.flip_coin = lambda prob, blurb: False
+        assert_equal(self.moveeffect.attempt_use(), [None])
+        self.assert_changes(pp=4)
 
-    def testNoAccuracy(self):
+    def test_no_accuracy(self):
         self.moveeffect.accuracy = None
-        self.field.flipCoin = lambda prob, blurb: False
-        (hit, ) = self.moveeffect.attemptUse()
+        self.field.flip_coin = lambda prob, blurb: False
+        (hit, ) = self.moveeffect.attempt_use()
         assert_equal(hit.damage, 10)
-        self.assertChanges(hp=30, pp=4)
+        self.assert_changes(hp=30, pp=4)
 
-    def testMultipleTargets(self):
+    def test_multiple_targets(self):
         self.move.targetting.targets = lambda u, t: [t, self.user]
-        (hitA, hitB) = self.moveeffect.attemptUse()
+        (hitA, hitB) = self.moveeffect.attempt_use()
         assert_equal(hitA.damage, 10)
         assert_equal(hitB.damage, 10)
         assert_equal(hitA.target, self.target)
         assert_equal(hitB.target, self.user)
-        self.assertChanges(hp=30, pp=4)
+        self.assert_changes(hp=30, pp=4)
         assert_equal(self.user.battler.hp, 20)

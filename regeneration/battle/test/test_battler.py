@@ -23,7 +23,7 @@ class FakeSpot(object):
     field = None
 
 @quiet
-def testBattler():
+def test_battler():
     session = connect()
 
     species = session.query(FormTable).filter_by(id=1).one()
@@ -31,7 +31,7 @@ def testBattler():
     bulba = battler.Battler(bulba, FakeSpot(), loader)
 
     assert_equal(bulba.ability.id, 65)
-    bulba.ability = loader.loadAbility('stench')
+    bulba.ability = loader.load_ability('stench')
     assert_equal(bulba.ability.id, 1)
     assert_equal(bulba.monster.ability.id, 65)
 
@@ -40,7 +40,7 @@ def testBattler():
             [m.kind.identifier for m in bulba.moves],
             'double-edge growth sweet-scent razor-leaf'.split(),
         )
-    bulba.setMove(0, loader.loadMove('pound'))
+    bulba.set_move(0, loader.load_move('pound'))
     assert_equal(
             [m.kind.identifier for m in bulba.moves],
             'pound growth sweet-scent razor-leaf'.split(),
@@ -64,7 +64,7 @@ def testBattler():
     assert bulba.monster.status == 'par'
 
     assert_equal(bulba.item, None)
-    bulba.item = loader.loadItem('fresh-water')
+    bulba.item = loader.load_item('fresh-water')
     assert_equal(bulba.item.id, 30)
     assert_equal(bulba.monster.item.id, 30)
 

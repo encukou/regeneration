@@ -13,11 +13,11 @@ __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
 @quiet
-def testGenders():
+def test_genders():
     assert_equal(gender.Gender.male.symbol, u'♂')
     assert_equal(gender.Gender.none.symbol, u'–')
 
-    assert gender.Gender.male.isOpposite(gender.Gender.female)
-    assert not gender.Gender.male.isOpposite(gender.Gender.male)
-    assert not gender.Gender.none.isOpposite(gender.Gender.male)
-    assert not gender.Gender.male.isOpposite(gender.Gender.none)
+    assert gender.Gender.male.is_opposite(gender.Gender.female)
+    assert not gender.Gender.male.is_opposite(gender.Gender.male)
+    assert not gender.Gender.none.is_opposite(gender.Gender.male)
+    assert not gender.Gender.male.is_opposite(gender.Gender.none)

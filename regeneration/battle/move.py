@@ -33,7 +33,7 @@ class Move(object):
         self.kind = kind
         self.pp = self.maxpp = maxpp
 
-        self.targetting = MoveTargetting.byIdentifier(kind.target.identifier)
+        self.targetting = MoveTargetting.by_identifier(kind.target.identifier)
 
         # We like convenient-er accessors to common things
         self.flags = MoveFlags(kind)
@@ -42,7 +42,7 @@ class Move(object):
         return "%s (%s/%s PP)" % (self.kind.identifier, self.pp, self.maxpp)
 
     @property
-    def damageClass(self):
+    def damage_class(self):
         return self.kind.damage_class
 
     @property

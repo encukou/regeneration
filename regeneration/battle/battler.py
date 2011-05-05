@@ -21,7 +21,7 @@ class Battler(EffectSubject):
     Monster, but keeps volatile things (stat/ability/move changes) to itself,
     to be forgotten when a battle ends.
     """
-    forcedMove = None
+    forced_move = None
 
     def __init__(self, monster, spot, loader):
         EffectSubject.__init__(self, spot.field)
@@ -32,7 +32,7 @@ class Battler(EffectSubject):
         self.ability = monster.ability
 
         self.stats = Stats(monster.stats)
-        self.statLevels = Stats(loader.battleStats)
+        self.stat_levels = Stats(loader.battle_stats)
 
         self.moves = list(monster.moves)
 
@@ -76,9 +76,9 @@ class Battler(EffectSubject):
         return self.monster.item
 
     @item.setter
-    def item(self, newItem):
-        self.monster.item = newItem
+    def item(self, new_item):
+        self.monster.item = new_item
 
-    def setMove(self, i, kind):
+    def set_move(self, i, kind):
         self.moves = list(self.moves)
         self.moves[i] = Move(kind)

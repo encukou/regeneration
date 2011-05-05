@@ -16,13 +16,13 @@ __email__ = 'encukou@gmail.com'
 
 class BlockingEffect(effect.Effect):
     @effect.callback
-    def blockApplication(self, effect):
+    def block_application(self, effect):
         if effect is not self:
             return True
 
 class UnapplicableEffect(effect.Effect):
     @effect.callback
-    def blockApplication(self, effect):
+    def block_application(self, effect):
         return True
 
 class RecordingEffect(effect.Effect):
@@ -50,164 +50,164 @@ class CountingEffect(effect.Effect):
     def count(self, subject, value):
         return value + 1
 
-@effect.uniqueEffect
+@effect.unique_effect
 class UniqueEffect(effect.Effect):
     pass
 
 class TestEffect(QuietTestCase):
     def setUp(self):
         super(TestEffect, self).setUp()
-        self.fakeField = effect.EffectSubject(None)
-        self.fakeField.field = self.fakeField
-        self.subjectA = effect.EffectSubject(self.fakeField)
-        self.subjectB = effect.EffectSubject(self.fakeField)
-        self.fakeField.activeSubSubjects = self.subjectA, self.subjectB
+        self.fake_field = effect.EffectSubject(None)
+        self.fake_field.field = self.fake_field
+        self.subject_a = effect.EffectSubject(self.fake_field)
+        self.subject_b = effect.EffectSubject(self.fake_field)
+        self.fake_field.active_subsubjects = self.subject_a, self.subject_b
 
-    def assertActiveEffects(self, *effects):
-        assert_equal(set(self.fakeField.activeEffects), set(effects))
+    def assert_active_effects(self, *effects):
+        assert_equal(set(self.fake_field.active_effects), set(effects))
 
-    def testEmptiness(self):
-        self.assertActiveEffects()
+    def test_emptiness(self):
+        self.assert_active_effects()
 
-    def testSimpleApplication(self):
+    def test_simple_application(self):
         eff = effect.Effect()
-        self.subjectA.giveEffect(self.fakeField, eff)
-        self.assertActiveEffects(eff)
+        self.subject_a.give_effect(self.fake_field, eff)
+        self.assert_active_effects(eff)
 
-    def testApplicationReturnValue(self):
+    def test_application_return_value(self):
         eff = effect.Effect()
-        applied = self.subjectA.giveEffect(self.subjectB, eff)
-        assert eff.subject is self.subjectB
-        assert eff.inducer is self.subjectA
+        applied = self.subject_a.give_effect(self.subject_b, eff)
+        assert eff.subject is self.subject_b
+        assert eff.inducer is self.subject_a
         assert applied is eff
 
-    def testTwoApplications(self):
-        effA = effect.Effect()
-        effB = effect.Effect()
-        self.subjectA.giveEffect(self.subjectB, effA)
-        self.subjectA.giveEffect(self.subjectB, effB)
-        self.assertActiveEffects(effA, effB)
+    def test_two_applications(self):
+        eff_a = effect.Effect()
+        eff_b = effect.Effect()
+        self.subject_a.give_effect(self.subject_b, eff_a)
+        self.subject_a.give_effect(self.subject_b, eff_b)
+        self.assert_active_effects(eff_a, eff_b)
 
-    def testSelfApplication(self):
+    def test_self_application(self):
         eff = effect.Effect()
-        applied = self.subjectA.giveEffectSelf(eff)
-        assert eff.subject is self.subjectA
-        assert eff.inducer is self.subjectA
+        applied = self.subject_a.give_effect_self(eff)
+        assert eff.subject is self.subject_a
+        assert eff.inducer is self.subject_a
         assert applied is eff
 
-    def testRemoval(self):
-        effA = self.subjectA.giveEffectSelf(effect.Effect())
-        effB = self.subjectA.giveEffectSelf(effect.Effect())
-        effB.remove()
-        self.assertActiveEffects(effA)
+    def test_removal(self):
+        eff_a = self.subject_a.give_effect_self(effect.Effect())
+        eff_b = self.subject_a.give_effect_self(effect.Effect())
+        eff_b.remove()
+        self.assert_active_effects(eff_a)
 
-    def testUnapplicable(self):
-        effA = self.subjectA.giveEffectSelf(UnapplicableEffect())
-        assert_equal(effA, None)
-        self.assertActiveEffects()
+    def test_unapplicable(self):
+        eff_a = self.subject_a.give_effect_self(UnapplicableEffect())
+        assert_equal(eff_a, None)
+        self.assert_active_effects()
 
-    def testApplyNone(self):
-        effA = self.subjectA.giveEffectSelf(None)
-        assert_equal(effA, None)
-        self.assertActiveEffects()
+    def test_apply_none(self):
+        eff_a = self.subject_a.give_effect_self(None)
+        assert_equal(eff_a, None)
+        self.assert_active_effects()
 
-    def testBlocker(self):
-        blocker = self.subjectA.giveEffectSelf(BlockingEffect())
-        self.assertActiveEffects(blocker)
-        effA = self.subjectA.giveEffectSelf(effect.Effect())
-        assert_equal(effA, None)
-        self.assertActiveEffects(blocker)
+    def test_blocker(self):
+        blocker = self.subject_a.give_effect_self(BlockingEffect())
+        self.assert_active_effects(blocker)
+        eff_a = self.subject_a.give_effect_self(effect.Effect())
+        assert_equal(eff_a, None)
+        self.assert_active_effects(blocker)
 
-    def testBlockerDisabled(self):
-        blocker = self.subjectA.giveEffectSelf(BlockingEffect())
+    def test_blocker_disabled(self):
+        blocker = self.subject_a.give_effect_self(BlockingEffect())
         with blocker.disabled():
-            effA = self.subjectA.giveEffectSelf(effect.Effect())
-        assert effA != None
-        self.assertActiveEffects(blocker, effA)
+            eff_a = self.subject_a.give_effect_self(effect.Effect())
+        assert eff_a != None
+        self.assert_active_effects(blocker, eff_a)
 
-    def testBlockerReenabled(self):
-        blocker = self.subjectA.giveEffectSelf(BlockingEffect())
+    def test_blocker_reenabled(self):
+        blocker = self.subject_a.give_effect_self(BlockingEffect())
         with blocker.disabled():
             pass
-        effA = self.subjectA.giveEffectSelf(effect.Effect())
-        assert_equal(effA, None)
-        self.assertActiveEffects(blocker)
+        eff_a = self.subject_a.give_effect_self(effect.Effect())
+        assert_equal(eff_a, None)
+        self.assert_active_effects(blocker)
 
-    def testDisableNesting(self):
-        blocker = self.subjectA.giveEffectSelf(BlockingEffect())
+    def test_disable_nesting(self):
+        blocker = self.subject_a.give_effect_self(BlockingEffect())
         with blocker.disabled():
-            effA = self.subjectA.giveEffectSelf(effect.Effect())
+            eff_a = self.subject_a.give_effect_self(effect.Effect())
             with blocker.disabled():
-                effB = self.subjectA.giveEffectSelf(effect.Effect())
-        unapplied = self.subjectA.giveEffectSelf(effect.Effect())
-        self.assertActiveEffects(blocker, effA, effB)
+                eff_b = self.subject_a.give_effect_self(effect.Effect())
+        unapplied = self.subject_a.give_effect_self(effect.Effect())
+        self.assert_active_effects(blocker, eff_a, eff_b)
 
-    def testGetEffectsAll(self):
-        effA = self.subjectA.giveEffectSelf(RecordingEffect())
-        effB = self.subjectA.giveEffectSelf(OtherRecordingEffect())
-        effC = self.subjectA.giveEffectSelf(effect.Effect())
+    def test_get_effects_all(self):
+        eff_a = self.subject_a.give_effect_self(RecordingEffect())
+        eff_b = self.subject_a.give_effect_self(OtherRecordingEffect())
+        effC = self.subject_a.give_effect_self(effect.Effect())
         assert_equal(
-                set(self.subjectA.getEffects()),
-                set([effA, effB, effC])
+                set(self.subject_a.get_effects()),
+                set([eff_a, eff_b, effC])
             )
 
-    def testGetEffectsSpecific(self):
-        effA = self.subjectA.giveEffectSelf(RecordingEffect())
-        effB = self.subjectA.giveEffectSelf(OtherRecordingEffect())
-        effC = self.subjectA.giveEffectSelf(effect.Effect())
-        assert_equal(list(self.subjectA.getEffects(RecordingEffect)), [effA])
+    def test_get_effects_specific(self):
+        eff_a = self.subject_a.give_effect_self(RecordingEffect())
+        eff_b = self.subject_a.give_effect_self(OtherRecordingEffect())
+        effC = self.subject_a.give_effect_self(effect.Effect())
+        assert_equal(list(self.subject_a.get_effects(RecordingEffect)), [eff_a])
 
-    def testGetEffectsNonexisting(self):
-        effA = self.subjectA.giveEffectSelf(RecordingEffect())
-        effB = self.subjectA.giveEffectSelf(OtherRecordingEffect())
-        effC = self.subjectA.giveEffectSelf(effect.Effect())
-        assert_equal(list(self.subjectA.getEffects(BlockingEffect)), [])
+    def test_get_effects_nonexisting(self):
+        eff_a = self.subject_a.give_effect_self(RecordingEffect())
+        eff_b = self.subject_a.give_effect_self(OtherRecordingEffect())
+        effC = self.subject_a.give_effect_self(effect.Effect())
+        assert_equal(list(self.subject_a.get_effects(BlockingEffect)), [])
 
-    def testGetEffectAny(self):
-        eff = self.subjectA.giveEffectSelf(RecordingEffect())
-        assert_equal(self.subjectA.getEffect(), eff)
+    def test_get_effect_any(self):
+        eff = self.subject_a.give_effect_self(RecordingEffect())
+        assert_equal(self.subject_a.get_effect(), eff)
 
-    def testGetEffectSpecfic(self):
-        effA = self.subjectA.giveEffectSelf(effect.Effect())
-        effB = self.subjectA.giveEffectSelf(RecordingEffect())
-        assert_equal(self.subjectA.getEffect(RecordingEffect), effB)
+    def test_get_effect_specfic(self):
+        eff_a = self.subject_a.give_effect_self(effect.Effect())
+        eff_b = self.subject_a.give_effect_self(RecordingEffect())
+        assert_equal(self.subject_a.get_effect(RecordingEffect), eff_b)
 
-    def testGetEffectNonexisting(self):
-        eff = self.subjectA.giveEffectSelf(RecordingEffect())
-        assert_equal(self.subjectA.getEffect(OtherRecordingEffect), None)
+    def test_get_effect_nonexisting(self):
+        eff = self.subject_a.give_effect_self(RecordingEffect())
+        assert_equal(self.subject_a.get_effect(OtherRecordingEffect), None)
 
-    def testReparent(self):
-        eff = self.subjectA.giveEffectSelf(effect.Effect())
-        eff.reparent(self.subjectB)
-        assert eff.inducer is self.subjectA
-        assert eff.subject is self.subjectB
-        assert_equal(list(self.subjectA.getEffects()), [])
-        assert_equal(list(self.subjectB.getEffects()), [eff])
+    def test_reparent(self):
+        eff = self.subject_a.give_effect_self(effect.Effect())
+        eff.reparent(self.subject_b)
+        assert eff.inducer is self.subject_a
+        assert eff.subject is self.subject_b
+        assert_equal(list(self.subject_a.get_effects()), [])
+        assert_equal(list(self.subject_b.get_effects()), [eff])
 
-    def testGoodCall(self):
+    def test_good_call(self):
         results = set()
-        effA = self.subjectA.giveEffectSelf(RecordingEffect(results))
-        effB = self.subjectA.giveEffectSelf(OtherRecordingEffect(results))
-        RecordingEffect.append(self.subjectB, 'abc')
-        assert_equal(results, set([('abc', effA)]))
-        OtherRecordingEffect.append(self.subjectB, 'def')
-        assert_equal(results, set([('abc', effA), ('def', effB)]))
+        eff_a = self.subject_a.give_effect_self(RecordingEffect(results))
+        eff_b = self.subject_a.give_effect_self(OtherRecordingEffect(results))
+        RecordingEffect.append(self.subject_b, 'abc')
+        assert_equal(results, set([('abc', eff_a)]))
+        OtherRecordingEffect.append(self.subject_b, 'def')
+        assert_equal(results, set([('abc', eff_a), ('def', eff_b)]))
 
-    def testStr(self):
+    def test_str(self):
         assert 'RecordingEffect' in str(RecordingEffect())
 
-    def testRepr(self):
+    def test_repr(self):
         assert 'RecordingEffect' in repr(RecordingEffect())
 
-    def testUniqueEffect(self):
-        uniq = self.fakeField.giveEffectSelf(UniqueEffect())
-        assert_equal(set(self.fakeField.activeEffects), set([uniq]))
-        assert_equal(self.fakeField.giveEffectSelf(UniqueEffect()), None)
-        assert_equal(set(self.fakeField.activeEffects), set([uniq]))
+    def test_unique_effect(self):
+        uniq = self.fake_field.give_effect_self(UniqueEffect())
+        assert_equal(set(self.fake_field.active_effects), set([uniq]))
+        assert_equal(self.fake_field.give_effect_self(UniqueEffect()), None)
+        assert_equal(set(self.fake_field.active_effects), set([uniq]))
 
-    def testChaining(self):
-        assert_equal(CountingEffect.count(self.subjectA, 0), 0)
-        self.subjectB.giveEffectSelf(CountingEffect())
-        assert_equal(CountingEffect.count(self.subjectA, 0), 1)
-        self.subjectB.giveEffectSelf(CountingEffect())
-        assert_equal(CountingEffect.count(self.subjectA, 0), 2)
+    def test_chaining(self):
+        assert_equal(CountingEffect.count(self.subject_a, 0), 0)
+        self.subject_b.give_effect_self(CountingEffect())
+        assert_equal(CountingEffect.count(self.subject_a, 0), 1)
+        self.subject_b.give_effect_self(CountingEffect())
+        assert_equal(CountingEffect.count(self.subject_a, 0), 2)

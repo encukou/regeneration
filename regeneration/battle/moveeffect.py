@@ -57,35 +57,35 @@ class MoveEffect(object):
         self.target = target
         self.type = move.type
         self.accuracy = move.accuracy
-        self.damageClass = move.damageClass
+        self.damage_class = move.damage_class
         self.targetting = move.targetting
 
         if move.pp is None:
             self.flags = self.flags.union([self.ppless])
 
-    def beginTurn(self):
+    def begin_turn(self):
         """Called at the beginning of a turn"""
         return None
 
-    def copyToUser(self, user):
+    def copy_to_user(self, user):
         return type(self)(self.field, self.move, user, self.target)
 
     def fail(self, hit=None):
         """Signals failure"""
         return
 
-    def attemptUse(self, **kwargs):
-        if Effect.preventUse(self):
+    def attempt_use(self, **kwargs):
+        if Effect.prevent_use(self):
             return self.fail()
-        return self.doUse()
+        return self.do_use()
 
-    def doUse(self, **kwargs):
-        self.deductPP()
+    def do_use(self, **kwargs):
+        self.deduct_pp()
         return self.use(**kwargs)
 
     def use(self, **kwargs):
         self.hits = [hit for hit in self.hits(**kwargs)]
-        return [self.attemptHit(hit) for hit in self.hits]
+        return [self.attempt_hit(hit) for hit in self.hits]
 
     def hits(self, **kwargs):
         for target in self.targets(**kwargs):
@@ -98,50 +98,50 @@ class MoveEffect(object):
     def targettable(self, target, **kwargs):
         return not target.battler.fainted
 
-    def attemptHit(self, hit):
-        if Effect.preventHit(hit) or not self.rollAccuracy(hit):
+    def attempt_hit(self, hit):
+        if Effect.prevent_hit(hit) or not self.roll_accuracy(hit):
             return self.fail(hit)
-        return self.doHit(hit)
+        return self.do_hit(hit)
 
-    def rollAccuracy(self, hit):
-        accuracy = Effect.modifyAccuracy(hit, hit.accuracy)
+    def roll_accuracy(self, hit):
+        accuracy = Effect.modify_accuracy(hit, hit.accuracy)
         if accuracy is None:
             return True
         else:
-            return self.field.flipCoin(accuracy, 'Determine hit')
+            return self.field.flip_coin(accuracy, 'Determine hit')
 
-    def doHit(self, hit):
-        Effect.moveHit(hit)
+    def do_hit(self, hit):
+        Effect.move_hit(hit)
         return self.hit(hit)
 
     def hit(self, hit):
         if self.power:
-            self.doDamage(hit)
+            self.do_damage(hit)
         return hit
 
-    def doDamage(self, hit):
-        hit.damage = self.calculateDamage(hit)
-        hit.damage = Effect.modifyMoveDamage(self, hit.damage, hit)
+    def do_damage(self, hit):
+        hit.damage = self.calculate_damage(hit)
+        hit.damage = Effect.modify_move_damage(self, hit.damage, hit)
         hit.target. battler.hp -= hit.damage
-        Effect.moveDamageDone(hit)
-        Effect.damageDone(hit.target, hit.damage)
+        Effect.move_damage_done(hit)
+        Effect.damage_done(hit.target, hit.damage)
 
-    def calculateDamage(self, hit):
+    def calculate_damage(self, hit):
         # This is too mechanic-specific to have in MoveEffect
-        return self.field.calculateDamage(hit)
+        return self.field.calculate_damage(hit)
 
-    def deductPP(self):
+    def deduct_pp(self):
         if self.ppless not in self.flags:
-            self.move.pp -= Effect.ppReduction(self, 1)
+            self.move.pp -= Effect.pp_reduction(self, 1)
 
 class Hit(object):
-    def __init__(self, moveEffect, target, **kwargs):
-        self.moveEffect = moveEffect
+    def __init__(self, move_effect, target, **kwargs):
+        self.move_effect = move_effect
         self.target = target
-        self.field = moveEffect.field
-        self.user = moveEffect.user
-        self.power = moveEffect.power
-        self.type = moveEffect.type
-        self.accuracy = moveEffect.accuracy
-        self.damageClass = moveEffect.damageClass
+        self.field = move_effect.field
+        self.user = move_effect.user
+        self.power = move_effect.power
+        self.type = move_effect.type
+        self.accuracy = move_effect.accuracy
+        self.damage_class = move_effect.damage_class
         self.args = kwargs

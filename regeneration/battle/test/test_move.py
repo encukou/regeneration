@@ -14,7 +14,7 @@ __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
 @quiet
-def testMove():
+def test_move():
     session = connect()
     pound = move.Move(session.query(tables.Move).filter_by(id=1).one())
     assert_equal(pound.power, 40)
@@ -22,7 +22,7 @@ def testMove():
     assert_equal(pound.accuracy, 1)
     assert_equal(pound.priority, 0)
     assert_equal(pound.type.identifier, 'normal')
-    assert_equal(pound.damageClass.identifier, 'physical')
+    assert_equal(pound.damage_class.identifier, 'physical')
 
     pound.pp -= 1
     assert_equal(pound.pp, 34)

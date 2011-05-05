@@ -49,11 +49,11 @@ class WriteLogger():
             self.stack = traceback.format_stack()[:-1]
 
 @contextmanager
-def quietContext():
+def quiet_context():
     sys.stdout = logger = WriteLogger(sys.stdout)
-    origStdout = sys.stdout
+    orig_stdout = sys.stdout
     yield
-    sys.stdout = origStdout
+    sys.stdout = orig_stdout
     if logger.stack:
         print; print '-----'
         for line in logger.stack:
@@ -65,18 +65,18 @@ def quiet(func):
     """Make sure the decorated test doesn't write to stdout
     """
     @wraps(func)
-    def hushedTest(*args, **kwargs):
-        with quietContext():
+    def hushed_test(*args, **kwargs):
+        with quiet_context():
             func(*args, **kwargs)
-    return hushedTest
+    return hushed_test
 
 class QuietTestCase(unittest.TestCase):
     def setUp(self):
-        self.__quietContext = quietContext()
-        self.__quietContext.__enter__()
+        self.__quiet_context = quiet_context()
+        self.__quiet_context.__enter__()
 
-    def tearDown(self):
-        self.__quietContext.__exit__(None, None, None)
+    def teardown(self):
+        self.__quiet_context.__exit__(None, None, None)
 
 def assert_equal(a, b, *args, **kwargs):  # not camelCase to match nose
     """Like assert_equal, buts print a diff of yaml dumps to stdout on failure
