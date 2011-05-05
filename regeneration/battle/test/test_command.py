@@ -5,7 +5,7 @@ from itertools import chain, izip_longest, product
 
 from nose.tools import assert_equal
 
-from regeneration.battle.example import connect, tables, loader
+from regeneration.battle.example import connect, tables, loader, FormTable
 from regeneration.battle.test import (
         quiet, FakeRand, assert_all_equal, QuietTestCase
     )
@@ -47,7 +47,7 @@ class TestCommand(QuietTestCase):
     @classmethod
     def setupClass(cls):
         cls.session = connect()
-        cls.species = cls.session.query(tables.Form).filter_by(id=1).one()
+        cls.species = cls.session.query(FormTable).filter_by(id=1).one()
 
     def setUp(self):
         super(TestCommand, self).setUp()

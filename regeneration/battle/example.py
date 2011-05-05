@@ -69,28 +69,6 @@ class Loader(object):
 
 loader = Loader(connect())
 
-# Monkey-patches
-# XXX: deal with these better
-
-@property
-def getIdentifier(self):
-    return self.name.lower().replace(' ', '-')
-
-def patchIdentifier(table):
-    if not hasattr(table, 'identifier'):
-        table.identifier = getIdentifier
-
-patchIdentifier(tables.MoveDamageClass)
-patchIdentifier(tables.Stat)
-patchIdentifier(tables.Ability)
-patchIdentifier(tables.PokemonMoveMethod)
-patchIdentifier(tables.Move)
-patchIdentifier(tables.Pokemon)
-patchIdentifier(tables.PokemonForm)
-patchIdentifier(tables.Nature)
-patchIdentifier(tables.Type)
-
-tables.Species = tables.Pokemon
-tables.Species.species_moves = property(lambda self: self.pokemon_moves)
-tables.Form = tables.PokemonForm
-tables.Form.species = tables.Form.pokemon
+FormTable = tables.PokemonForm
+FormTable.monster = FormTable.pokemon
+tables.Pokemon.monster_moves = tables.Pokemon.pokemon_moves

@@ -5,7 +5,7 @@ from nose.tools import assert_almost_equal
 
 from regeneration.battle.test import FakeRand, quiet, assert_equal
 from regeneration.battle.gender import Gender
-from regeneration.battle.example import connect, tables, loader
+from regeneration.battle.example import connect, tables, loader, FormTable
 
 from regeneration.battle import monster
 
@@ -17,7 +17,7 @@ __email__ = 'encukou@gmail.com'
 def testMonster():
     session = connect()
 
-    species = session.query(tables.Form).filter_by(id=1).one()
+    species = session.query(FormTable).filter_by(id=1).one()
     bulba = monster.Monster(species, 30, loader, rand=FakeRand())
     assert_equal(bulba.ability.identifier, 'overgrow')
     assert_equal(bulba.gender.identifier, 'female')
@@ -71,7 +71,7 @@ def testMonster():
     del saved['genes']
     assert_equal(monster.Monster.load(saved, loader).genes.values(), [0] * 6)
 
-    species = session.query(tables.Form).filter_by(id=137).one()
+    species = session.query(FormTable).filter_by(id=137).one()
     gon = monster.Monster(species, 30, loader, rand=FakeRand())
     assert_equal(gon.ability.identifier, 'trace')
     assert_equal(gon.gender.identifier, 'none')

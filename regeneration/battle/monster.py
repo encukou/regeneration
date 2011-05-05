@@ -38,6 +38,7 @@ class Monster(object):
         """
 
         self.form = form
+        self.kind = form.monster
         self.species = form.species
         self.level = level
 
@@ -55,9 +56,9 @@ class Monster(object):
 
         self.status = 'ok'
 
-        self.gender = Gender.Random(self.species.species.gender_rate, rand=rand)
+        self.gender = Gender.Random(self.species.gender_rate, rand=rand)
 
-        self.tameness = self.species.species.base_happiness
+        self.tameness = self.species.base_happiness
 
         self.shiny = random.randint(0, 65535) < 8
 
@@ -65,11 +66,11 @@ class Monster(object):
             self.setMoves(self._wildMovesAtLevel(level))
 
         try:
-            self.item = rand.choice(self.species.items).item
+            self.item = rand.choice(self.kind.items).item
         except IndexError:
             self.item = None
 
-        self.ability = rand.choice(self.species.abilities)
+        self.ability = rand.choice(self.kind.abilities)
 
     def setMoves(self, kinds):
         self.moves = [Move(kind) for kind in kinds]
@@ -81,7 +82,7 @@ class Monster(object):
         missingHp = self.stats.hp - self.hp
         for stat in self.genes:
             (pstat,) = (
-                    pstat for pstat in self.species.stats
+                    pstat for pstat in self.kind.stats
                     if pstat.stat.name == stat.name
                 )
             base = pstat.base_stat
@@ -115,7 +116,7 @@ class Monster(object):
             """
         )
 
-    types = property(lambda self: self.species.types)
+    types = property(lambda self: self.kind.types)
 
     def __str__(self):
         return self.name
@@ -131,7 +132,7 @@ class Monster(object):
         # XXX: This could be sped up if some magic is used so the underlying
         # query can be accessed => searching in SQL directly. Worth it?
         movelist = list(x for x
-                in self.species.species_moves
+                in self.kind.monster_moves
                 if x.level <= level and x.method.identifier == 'level-up')
         movelist.sort(
                 key=lambda x: (
@@ -154,8 +155,8 @@ class Monster(object):
         """Save the monster to a dict"""
         return dict(
                 nickname=self._name,
-                species=self.species.species.identifier,
-                form=self.species.default_form.form_identifier,
+                species=self.species.identifier,
+                form=self.form.form_identifier,
                 level=self.level,
                 shiny=self.shiny,
                 met='',

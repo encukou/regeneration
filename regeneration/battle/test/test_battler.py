@@ -4,7 +4,7 @@
 from nose.tools import assert_equal, assert_almost_equal
 
 from regeneration.battle.test import quiet
-from regeneration.battle.example import connect, tables, loader
+from regeneration.battle.example import connect, tables, loader, FormTable
 
 from regeneration.battle import battler, monster
 
@@ -26,7 +26,7 @@ class FakeSpot(object):
 def testBattler():
     session = connect()
 
-    species = session.query(tables.Form).filter_by(id=1).one()
+    species = session.query(FormTable).filter_by(id=1).one()
     bulba = monster.Monster(species, 30, loader, rand=FakeRand())
     bulba = battler.Battler(bulba, FakeSpot(), loader)
 
