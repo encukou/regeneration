@@ -80,6 +80,7 @@ class MoveEffect(object):
         return self.do_use()
 
     def do_use(self, **kwargs):
+        self.field.message.UseMove(battler=self.user, moveeffect=self)
         self.deduct_pp()
         return self.use(**kwargs)
 
@@ -122,8 +123,7 @@ class MoveEffect(object):
     def do_damage(self, hit):
         hit.damage = self.calculate_damage(hit)
         hit.damage = Effect.modify_move_damage(self, hit.damage, hit)
-        hit.target. battler.hp -= hit.damage
-        Effect.move_damage_done(hit)
+        hit.target.battler.do_damage(hit.damage, direct=True)
         Effect.damage_done(hit.target, hit.damage)
 
     def calculate_damage(self, hit):
@@ -132,7 +132,19 @@ class MoveEffect(object):
 
     def deduct_pp(self):
         if self.ppless not in self.flags:
-            self.move.pp -= Effect.pp_reduction(self, 1)
+            delta = -min(self.move.pp, Effect.pp_reduction(self, 1))
+            self.move.pp += delta
+            self.field.message.PPChange(move=self.move, battler=self.user,
+                    delta=delta, pp=self.move.pp, cause=self)
+
+    def message_values(self, public=False):
+        return dict(
+                id=id(self),
+                name=self.move.name,
+                move=self.move.message_values(public),
+                user=self.user.message_values(public),
+                target=public and self.target.message_values(public),
+            )
 
 class Hit(object):
     def __init__(self, move_effect, target, **kwargs):

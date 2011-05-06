@@ -50,6 +50,10 @@ class Move(object):
         return self.kind.priority
 
     @property
+    def name(self):
+        return self.kind.name
+
+    @property
     def accuracy(self):
         if not self.kind.accuracy:
             return None
@@ -67,6 +71,12 @@ class Move(object):
     def type(self):
         return self.kind.type
 
+    def message_values(self, public=False):
+        return dict(
+                id=id(self),
+                name=self.name,
+                identifier=self.kind.identifier,
+            )
 
 class MoveFlags(object):
     def __init__(self, kind):

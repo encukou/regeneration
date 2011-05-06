@@ -5,7 +5,7 @@ from fractions import Fraction
 from collections import namedtuple
 from functools import partial
 
-from regeneration.battle.effect import EffectSubject
+from regeneration.battle.effect import Effect, EffectSubject
 from regeneration.battle.stats import Stats
 from regeneration.battle.move import Move
 
@@ -82,6 +82,14 @@ class Battler(EffectSubject):
     def set_move(self, i, kind):
         self.moves = list(self.moves)
         self.moves[i] = Move(kind)
+
+    def do_damage(self, damage, direct=False):
+        self.hp -= damage
+        Effect.damage_done(self, damage)
+        self.field.message.HPChange(battler=self, direct=direct,
+                delta=-damage, hp=self.hp)
+        if self.hp <= 0:
+            self.field.message.Fainted(battler=self)
 
     def message_values(self, public=False):
         return dict(

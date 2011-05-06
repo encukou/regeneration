@@ -54,7 +54,7 @@ class Message(Mapping):
             for name, arg_type in self.argument_types.items():
                 if arg_type.public or not public:
                     value = self.arguments[name]
-                    if isinstance(value, (int, unicode)):
+                    if isinstance(value, (int, bool, unicode)):
                         contents[name] = value
                     else:
                         contents[name] = value.message_values(public or None)
@@ -143,4 +143,29 @@ class SubturnEnd(Message):
     message = "{battler}'s subturn {turn} ends."
     shown = None
     turn = MessageArgument()
+    battler = MessageArgument()
+
+
+class UseMove(Message):
+    message = "{battler} used {moveeffect.move}!"
+    moveeffect = MessageArgument()
+    battler = MessageArgument()
+
+class HPChange(Message):
+    message = "{battler} is down to {hp} HP!"
+    battler = MessageArgument()
+    delta = MessageArgument()
+    hp = MessageArgument()
+    direct = MessageArgument()
+
+class PPChange(Message):
+    message = "{battler}'s {move} is down to {pp} PP!"
+    battler = MessageArgument()
+    move = MessageArgument()
+    delta = MessageArgument()
+    pp = MessageArgument()
+    cause = MessageArgument()
+
+class Fainted(Message):
+    message = "{battler} fainted!"
     battler = MessageArgument()

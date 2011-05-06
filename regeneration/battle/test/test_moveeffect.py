@@ -16,10 +16,15 @@ __email__ = 'encukou@gmail.com'
 some_flags = set('spam eggs'.split())
 
 class Object(object):
-    pass
+    def do_damage(self, damage, *a, **ka):
+        self.hp -= damage
 
 class EffectSubclass(effect.Effect):
     pass
+
+class DummyMethods(object):
+    def __getattr__(self, a):
+        return lambda *a, **ka: None
 
 class FakeField(effect.EffectSubject):
     def __init__(self):
@@ -31,6 +36,10 @@ class FakeField(effect.EffectSubject):
 
     def calculate_damage(self, hit):
         return hit.power / 2
+
+    @property
+    def message(self):
+        return DummyMethods()
 
 class TestMoveEffectFlags(QuietTestCase):
     def test_flags_dict(self):
