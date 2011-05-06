@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 # Encoding: UTF-8
 
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'

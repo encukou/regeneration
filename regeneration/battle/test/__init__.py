@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 # Encoding: UTF-8
 
 """Helpers used in the tests
