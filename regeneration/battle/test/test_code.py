@@ -63,10 +63,9 @@ def test_style(name, filename):
                 assert not re.search('[A-Z]', name), (
                         '%s:%s: %s: Use pep8_function_names' % info_with_name
                     )
-            # Check that classes are new-style (and no space between name/paren)
+            # Check classes are new-style (and no space between name/paren)
             assert paren, (
-                    '%s:%s: %s: Missing parenthesis after name' % info_with_name
-                )
+                '%s:%s: %s: Missing parenthesis after name' % info_with_name)
         file_prop = file_prop_re.match(line.strip())
         if file_prop:
             file_props[file_prop.group(1)] = file_prop.group(2)
@@ -83,7 +82,7 @@ def test_terminology(name, filename):
     if name in 'example movetargetting'.split():
         return
     for lineno, line in enumerate(open(filename), 1):
-        if line.strip() == 'CHECK@END': return
-        assert not bad_word_re.search(line), '%s:%s: Watch your terminology' % (
-                filename, lineno
-            )
+        if line.strip() == 'CHECK@END':
+            return
+        assert not bad_word_re.search(line), (
+                '%s:%s: Watch your terminology' % (filename, lineno))
