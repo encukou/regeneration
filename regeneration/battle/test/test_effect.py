@@ -3,10 +3,8 @@
 
 from itertools import chain, izip_longest
 
-from nose.tools import assert_raises, raises
-
 from regeneration.battle.example import connect, tables, loader
-from regeneration.battle.test import QuietTestCase, assert_equal
+from regeneration.battle.test import QuietTestCase
 
 from regeneration.battle import effect
 
@@ -55,8 +53,8 @@ class UniqueEffect(effect.Effect):
     pass
 
 class TestEffect(QuietTestCase):
-    def setUp(self):
-        super(TestEffect, self).setUp()
+    def setup_method(self, m):
+        super(TestEffect, self).setup_method(m)
         self.fake_field = effect.EffectSubject(None)
         self.fake_field.field = self.fake_field
         self.subject_a = effect.EffectSubject(self.fake_field)
@@ -64,7 +62,7 @@ class TestEffect(QuietTestCase):
         self.fake_field.active_subsubjects = self.subject_a, self.subject_b
 
     def assert_active_effects(self, *effects):
-        assert_equal(set(self.fake_field.active_effects), set(effects))
+        assert set(self.fake_field.active_effects) == set(effects)
 
     def test_emptiness(self):
         self.assert_active_effects()
@@ -103,19 +101,19 @@ class TestEffect(QuietTestCase):
 
     def test_unapplicable(self):
         eff_a = self.subject_a.give_effect_self(UnapplicableEffect())
-        assert_equal(eff_a, None)
+        assert eff_a == None
         self.assert_active_effects()
 
     def test_apply_none(self):
         eff_a = self.subject_a.give_effect_self(None)
-        assert_equal(eff_a, None)
+        assert eff_a == None
         self.assert_active_effects()
 
     def test_blocker(self):
         blocker = self.subject_a.give_effect_self(BlockingEffect())
         self.assert_active_effects(blocker)
         eff_a = self.subject_a.give_effect_self(effect.Effect())
-        assert_equal(eff_a, None)
+        assert eff_a == None
         self.assert_active_effects(blocker)
 
     def test_blocker_disabled(self):
@@ -130,7 +128,7 @@ class TestEffect(QuietTestCase):
         with blocker.disabled():
             pass
         eff_a = self.subject_a.give_effect_self(effect.Effect())
-        assert_equal(eff_a, None)
+        assert eff_a == None
         self.assert_active_effects(blocker)
 
     def test_disable_nesting(self):
@@ -146,8 +144,8 @@ class TestEffect(QuietTestCase):
         eff_a = self.subject_a.give_effect_self(RecordingEffect())
         eff_b = self.subject_a.give_effect_self(OtherRecordingEffect())
         effC = self.subject_a.give_effect_self(effect.Effect())
-        assert_equal(
-                set(self.subject_a.get_effects()),
+        assert (
+                set(self.subject_a.get_effects()) ==
                 set([eff_a, eff_b, effC])
             )
 
@@ -155,43 +153,43 @@ class TestEffect(QuietTestCase):
         eff_a = self.subject_a.give_effect_self(RecordingEffect())
         eff_b = self.subject_a.give_effect_self(OtherRecordingEffect())
         effC = self.subject_a.give_effect_self(effect.Effect())
-        assert_equal(list(self.subject_a.get_effects(RecordingEffect)), [eff_a])
+        assert list(self.subject_a.get_effects(RecordingEffect)) == [eff_a]
 
     def test_get_effects_nonexisting(self):
         eff_a = self.subject_a.give_effect_self(RecordingEffect())
         eff_b = self.subject_a.give_effect_self(OtherRecordingEffect())
         effC = self.subject_a.give_effect_self(effect.Effect())
-        assert_equal(list(self.subject_a.get_effects(BlockingEffect)), [])
+        assert list(self.subject_a.get_effects(BlockingEffect)) == []
 
     def test_get_effect_any(self):
         eff = self.subject_a.give_effect_self(RecordingEffect())
-        assert_equal(self.subject_a.get_effect(), eff)
+        assert self.subject_a.get_effect() == eff
 
     def test_get_effect_specfic(self):
         eff_a = self.subject_a.give_effect_self(effect.Effect())
         eff_b = self.subject_a.give_effect_self(RecordingEffect())
-        assert_equal(self.subject_a.get_effect(RecordingEffect), eff_b)
+        assert self.subject_a.get_effect(RecordingEffect) == eff_b
 
     def test_get_effect_nonexisting(self):
         eff = self.subject_a.give_effect_self(RecordingEffect())
-        assert_equal(self.subject_a.get_effect(OtherRecordingEffect), None)
+        assert self.subject_a.get_effect(OtherRecordingEffect) == None
 
     def test_reparent(self):
         eff = self.subject_a.give_effect_self(effect.Effect())
         eff.reparent(self.subject_b)
         assert eff.inducer is self.subject_a
         assert eff.subject is self.subject_b
-        assert_equal(list(self.subject_a.get_effects()), [])
-        assert_equal(list(self.subject_b.get_effects()), [eff])
+        assert list(self.subject_a.get_effects()) == []
+        assert list(self.subject_b.get_effects()) == [eff]
 
     def test_good_call(self):
         results = set()
         eff_a = self.subject_a.give_effect_self(RecordingEffect(results))
         eff_b = self.subject_a.give_effect_self(OtherRecordingEffect(results))
         RecordingEffect.append(self.subject_b, 'abc')
-        assert_equal(results, set([('abc', eff_a)]))
+        assert results == set([('abc', eff_a)])
         OtherRecordingEffect.append(self.subject_b, 'def')
-        assert_equal(results, set([('abc', eff_a), ('def', eff_b)]))
+        assert results == set([('abc', eff_a), ('def', eff_b)])
 
     def test_str(self):
         assert 'RecordingEffect' in str(RecordingEffect())
@@ -201,13 +199,13 @@ class TestEffect(QuietTestCase):
 
     def test_unique_effect(self):
         uniq = self.fake_field.give_effect_self(UniqueEffect())
-        assert_equal(set(self.fake_field.active_effects), set([uniq]))
-        assert_equal(self.fake_field.give_effect_self(UniqueEffect()), None)
-        assert_equal(set(self.fake_field.active_effects), set([uniq]))
+        assert set(self.fake_field.active_effects) == set([uniq])
+        assert self.fake_field.give_effect_self(UniqueEffect()) == None
+        assert set(self.fake_field.active_effects) == set([uniq])
 
     def test_chaining(self):
-        assert_equal(CountingEffect.count(self.subject_a, 0), 0)
+        assert CountingEffect.count(self.subject_a, 0) == 0
         self.subject_b.give_effect_self(CountingEffect())
-        assert_equal(CountingEffect.count(self.subject_a, 0), 1)
+        assert CountingEffect.count(self.subject_a, 0) == 1
         self.subject_b.give_effect_self(CountingEffect())
-        assert_equal(CountingEffect.count(self.subject_a, 0), 2)
+        assert CountingEffect.count(self.subject_a, 0) == 2

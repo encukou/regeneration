@@ -1,8 +1,6 @@
 #! /usr/bin/python
 # Encoding: UTF-8
 
-from nose.tools import assert_equal, assert_almost_equal
-
 from regeneration.battle.test import quiet
 from regeneration.battle.example import connect, tables, loader, FormTable
 
@@ -30,27 +28,27 @@ def test_battler():
     bulba = monster.Monster(species, 30, loader, rand=FakeRand())
     bulba = battler.Battler(bulba, FakeSpot(), loader)
 
-    assert_equal(bulba.ability.id, 65)
+    assert bulba.ability.id == 65
     bulba.ability = loader.load_ability('stench')
-    assert_equal(bulba.ability.id, 1)
-    assert_equal(bulba.monster.ability.id, 65)
+    assert bulba.ability.id == 1
+    assert bulba.monster.ability.id == 65
 
-    assert_equal(bulba.gender.identifier, 'female')
-    assert_equal(
-            [m.kind.identifier for m in bulba.moves],
-            'double-edge growth sweet-scent razor-leaf'.split(),
+    assert bulba.gender.identifier == 'female'
+    assert (
+            [m.kind.identifier for m in bulba.moves] ==
+            'double-edge growth sweet-scent razor-leaf'.split()
         )
     bulba.set_move(0, loader.load_move('pound'))
-    assert_equal(
-            [m.kind.identifier for m in bulba.moves],
-            'pound growth sweet-scent razor-leaf'.split(),
+    assert (
+            [m.kind.identifier for m in bulba.moves] ==
+            'pound growth sweet-scent razor-leaf'.split()
         )
-    assert_equal(
-            [m.kind.identifier for m in bulba.monster.moves],
-            'double-edge growth sweet-scent razor-leaf'.split(),
+    assert (
+            [m.kind.identifier for m in bulba.monster.moves] ==
+            'double-edge growth sweet-scent razor-leaf'.split()
         )
 
-    assert_equal(bulba.tameness, 70)
+    assert bulba.tameness == 70
     assert bulba.name.endswith('saur')
 
     assert not bulba.fainted
@@ -63,12 +61,12 @@ def test_battler():
     assert bulba.status == 'par'
     assert bulba.monster.status == 'par'
 
-    assert_equal(bulba.item, None)
+    assert bulba.item == None
     bulba.item = loader.load_item('fresh-water')
-    assert_equal(bulba.item.id, 30)
-    assert_equal(bulba.monster.item.id, 30)
+    assert bulba.item.id == 30
+    assert bulba.monster.item.id == 30
 
-    assert_equal(bulba.level, 30)
+    assert bulba.level == 30
     bulba.level = 10
-    assert_equal(bulba.level, 10)
-    assert_equal(bulba.monster.level, 30)
+    assert bulba.level == 10
+    assert bulba.monster.level == 30

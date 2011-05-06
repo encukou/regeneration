@@ -136,7 +136,7 @@ class CommandRequest(object):
                 items = self.battler.spot.trainer.items
             except AttributeError:
                 # No items...
-                items = ()
+                return
         for item in items:
             yield ItemCommand(self, item=item)
 

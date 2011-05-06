@@ -1,10 +1,10 @@
 #! /usr/bin/python
 # Encoding: UTF-8
 
-from nose.tools import raises
+import pytest
 
 from regeneration.battle.example import connect, tables, loader
-from regeneration.battle.test import assert_equal, QuietTestCase, FakeRand
+from regeneration.battle.test import QuietTestCase, FakeRand
 
 from regeneration.battle import trainer
 from regeneration.battle import command
@@ -17,8 +17,8 @@ class Object(object):
     pass
 
 class TestTrainer(QuietTestCase):
-    def setUp(self):
-        super(TestTrainer, self).setUp()
+    def setup_method(self, m):
+        super(TestTrainer, self).setup_method(m)
 
         self.mon1 = Object()
         self.mon1.fainted = False
@@ -46,9 +46,9 @@ class TestTrainer(QuietTestCase):
         self.request.field.command_allowed = lambda command: True
 
     def check_move_result(self, result, command='move', target='c'):
-        assert_equal(result.command, command)
-        assert_equal(result.move, self.move)
-        assert_equal(result.target, target)
+        assert result.command == command
+        assert result.move == self.move
+        assert result.target == target
 
     def test_trainer(self):
         result = self.trainer.request_command(self.request)
@@ -64,41 +64,41 @@ class TestTrainer(QuietTestCase):
         result = self.trainer.request_command(self.request)
         self.check_move_result(result, target=None)
 
-    @raises(AssertionError)
     def test_no_command(self):
-        self.request.commands = lambda: []
-        result = self.trainer.request_command(self.request)
+        with pytest.raises(AssertionError):
+            self.request.commands = lambda: []
+            result = self.trainer.request_command(self.request)
 
     def test_first_inactive(self):
-        assert_equal(self.trainer.get_first_inactive_monster([]), self.mon1)
-        assert_equal(
-                self.trainer.get_first_inactive_monster([self.mon1]),
-                self.mon2,
+        assert self.trainer.get_first_inactive_monster([]) == self.mon1
+        assert (
+                self.trainer.get_first_inactive_monster([self.mon1]) ==
+                self.mon2
             )
-        assert_equal(
-                self.trainer.get_first_inactive_monster([self.mon1, self.mon2]),
-                None,
+        assert (
+                None ==
+                self.trainer.get_first_inactive_monster([self.mon1, self.mon2])
             )
 
     def test_exclusion_inactive(self):
         exclude = []
-        assert_equal(self.trainer.get_first_inactive_monster(exclude), self.mon1)
-        assert_equal(self.trainer.get_first_inactive_monster(exclude), self.mon2)
-        assert_equal(self.trainer.get_first_inactive_monster(exclude), None)
+        assert self.trainer.get_first_inactive_monster(exclude) == self.mon1
+        assert self.trainer.get_first_inactive_monster(exclude) == self.mon2
+        assert self.trainer.get_first_inactive_monster(exclude) == None
 
     def test_random_inactive(self):
-        assert_equal(self.trainer.get_random_inactive_monster([]), self.mon2)
-        assert_equal(
-                self.trainer.get_random_inactive_monster([self.mon1]),
-                self.mon2,
+        assert self.trainer.get_random_inactive_monster([]) == self.mon2
+        assert (
+                self.trainer.get_random_inactive_monster([self.mon1]) ==
+                self.mon2
             )
-        assert_equal(
-                self.trainer.get_random_inactive_monster([self.mon1, self.mon2]),
-                None,
+        assert (
+                None ==
+                self.trainer.get_random_inactive_monster([self.mon1, self.mon2])
             )
 
     def test_exclusion_random(self):
         exclude = []
-        assert_equal(self.trainer.get_random_inactive_monster(exclude), self.mon2)
-        assert_equal(self.trainer.get_random_inactive_monster(exclude), self.mon1)
-        assert_equal(self.trainer.get_random_inactive_monster(exclude), None)
+        assert self.trainer.get_random_inactive_monster(exclude) == self.mon2
+        assert self.trainer.get_random_inactive_monster(exclude) == self.mon1
+        assert self.trainer.get_random_inactive_monster(exclude) == None

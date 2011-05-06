@@ -3,12 +3,8 @@
 
 from itertools import chain, izip_longest, product
 
-from nose.tools import assert_equal
-
 from regeneration.battle.example import connect, tables, loader, FormTable
-from regeneration.battle.test import (
-        quiet, FakeRand, assert_all_equal, QuietTestCase
-    )
+from regeneration.battle.test import quiet, FakeRand, QuietTestCase
 
 from regeneration.battle import monster
 from regeneration.battle import battler
@@ -40,17 +36,18 @@ class FakeTrainer(object):
         self.items = 'fake', 'item'
 
 class FakeSpot(object):
-    field = FakeField()
-    trainer = FakeTrainer()
+    def __init__(self):
+        self.field = FakeField()
+        self.trainer = FakeTrainer()
 
 class TestCommand(QuietTestCase):
     @classmethod
-    def setupClass(cls):
+    def setup_class(cls):
         cls.session = connect()
         cls.species = cls.session.query(FormTable).filter_by(id=1).one()
 
-    def setUp(self):
-        super(TestCommand, self).setUp()
+    def setup_method(self, m):
+        super(TestCommand, self).setup_method(m)
         self.bulba = monster.Monster(self.species, 30, loader, rand=FakeRand())
         self.battler = battler.Battler(self.bulba, FakeSpot(), loader)
         self.battler.spot.battler = self.battler
@@ -63,10 +60,10 @@ class TestCommand(QuietTestCase):
                 self.request.moves(),
                 self.battler.moves,
             ):
-            assert_equal(move_command.command, 'move')
-            assert_equal(move_command.battler, self.battler)
-            assert_equal(move_command.move, move)
-            assert_equal(move_command.target, None)
+            assert move_command.command, 'move'
+            assert move_command.battler == self.battler
+            assert move_command.move == move
+            assert move_command.target == None
 
     @quiet
     def test_switch_commands(self):
@@ -74,9 +71,9 @@ class TestCommand(QuietTestCase):
                 self.request.switches(),
                 FakeTrainer.team,
             ):
-            assert_equal(switch_command.command, 'switch')
-            assert_equal(switch_command.battler, self.battler)
-            assert_equal(switch_command.replacement, replacement)
+            assert switch_command.command == 'switch'
+            assert switch_command.battler == self.battler
+            assert switch_command.replacement == replacement
 
     @quiet
     def test_item_commands(self):
@@ -84,9 +81,9 @@ class TestCommand(QuietTestCase):
                 self.request.items(),
                 ('fake', 'item'),
             ):
-            assert_equal(item_command.command, 'item')
-            assert_equal(item_command.battler, self.battler)
-            assert_equal(item_command.item, item)
+            assert item_command.command == 'item'
+            assert item_command.battler == self.battler
+            assert item_command.item == item
 
     @quiet
     def test_forfeit_commands(self):
@@ -94,8 +91,8 @@ class TestCommand(QuietTestCase):
                 self.request.forfeits(),
                 ['run'],
             ):
-            assert_equal(run_command.command, 'run')
-            assert_equal(run_command.battler, self.battler)
+            assert run_command.command == 'run'
+            assert run_command.battler == self.battler
 
     @quiet
     def test_all_commands(self):
@@ -108,15 +105,15 @@ class TestCommand(QuietTestCase):
                     ),
                 self.request.commands(),
             ):
-            assert_equal(command_a, command_b)
+            assert command_a == command_b
 
     @quiet
     def test_unallowed_commands(self):
         self.request.field.command_allowed = lambda self: False
 
         (struggle, ) = self.request.moves()
-        assert_equal(struggle.command, 'move')
-        assert_equal(struggle.move.kind, FakeField.struggle)
+        assert struggle.command == 'move'
+        assert struggle.move.kind == FakeField.struggle
 
         for cmd in self.request.switches():
             raise AssertionError('%s is not allowed' % cmd)
@@ -135,9 +132,9 @@ class TestCommand(QuietTestCase):
     def test_targets(self):
         for cmd in self.request.commands():
             cmd.select()
-        assert_equal(
-                list(self.request.commands()),
-                list(self.request.field.selected_commands),
+        assert (
+                list(self.request.commands()) ==
+                list(self.request.field.selected_commands)
             )
 
     @quiet
@@ -156,4 +153,4 @@ class TestCommand(QuietTestCase):
         local_request = command.CommandRequest(local_battler)
         del local_battler.spot.trainer.items
 
-        assert_equal(list(self.request.items()), [])
+        assert list(local_request.items()) == []

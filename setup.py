@@ -19,7 +19,7 @@ setup(
             "pyyaml>=3.0",
         ],
     setup_requires=[
-            'nose>=0.11',
+            'pytest>=2.0',
         ],
     tests_require=[
             "pokedex>=0.1",

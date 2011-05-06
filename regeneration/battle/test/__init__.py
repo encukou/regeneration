@@ -5,26 +5,15 @@
 """
 
 import sys
-import unittest
 import yaml
 import difflib
 import traceback
 from functools import wraps
 from contextlib import contextmanager
 
-import nose.tools
-
 __copyright__ = 'Copyright 2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
-
-def assert_all_equal(head, *tail):  # not camelCase, to match nosetests API
-    """Assert every argument is equal to the first
-    """
-    for i, item in enumerate(tail):
-        assert_equal(head, item,
-                'Item %d (%r) is not equal to %r' % (i + 1, item, head)
-            )
 
 class FakeRand(object):
     """A random-like object that mostly returns zeroes – not random at all!
@@ -70,30 +59,10 @@ def quiet(func):
             func(*args, **kwargs)
     return hushed_test
 
-class QuietTestCase(unittest.TestCase):
-    def setUp(self):
+class QuietTestCase(object):
+    def setup_method(self, m):
         self.__quiet_context = quiet_context()
         self.__quiet_context.__enter__()
 
-    def teardown(self):
+    def teardown_method(self, m):
         self.__quiet_context.__exit__(None, None, None)
-
-def assert_equal(a, b, *args, **kwargs):  # not camelCase to match nose
-    """Like assert_equal, buts print a diff of yaml dumps to stdout on failure
-
-    (stdout is chosen because nose displays it more conveniently)
-    """
-    try:
-        nose.tools.assert_equal(a, b, *args, **kwargs)
-    except Exception, e:
-        try:
-            print 'YAML diff (+first, -second)'
-            for line in difflib.ndiff(
-                    *(yaml.dump(x, default_flow_style=False).splitlines()
-                            for x in (b, a)
-                        )
-                ):
-                print line
-        except:
-            print 'Cannot print YAML dump'
-        raise e
