@@ -4,6 +4,8 @@
 import itertools
 import random
 
+from regeneration.battle.monster import Monster
+
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
@@ -20,8 +22,8 @@ class Trainer(object):
         """Process CommandRequest: either return a Command or select() one later
 
         The base class implementation is geared towards simple AI trainers,
-        which should implement getCommand.
-        Human-played trainers should reimplement requestCommand itself.
+        which should implement get_commands.
+        Human-played trainers should reimplement request_command itself.
         """
         chain = itertools.chain(self.get_commands(request), request.commands())
         for command in chain:
@@ -41,8 +43,8 @@ class Trainer(object):
     def get_commands(self, request):
         """Yield commands in order of preference.
 
-        The first allowed one is used by requestCommand.
-        If none are allowed, requestCommand will select the first one
+        The first allowed one is used by request_command.
+        If none are allowed, request_command will select the first one
         from the request's list.
         The base class implementation does nothing.
         """
@@ -85,6 +87,18 @@ class Trainer(object):
         """Yield targets in order of preference. Similar to getCommands.
         """
         return ()
+
+    @classmethod
+    def load(cls, dct, loader, **kwargs):
+        if 'seed' in dct:
+            rand = random.Random(dct['seed'])
+        else:
+            rand = random
+        return cls(
+                name=dct['name'],
+                team=[Monster.load(d, loader) for d in dct['team']],
+                rand=rand,
+                **kwargs)
 
     def message_values(self, private=True):
         return dict(

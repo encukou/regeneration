@@ -10,6 +10,7 @@ from regeneration.battle.effect import Effect, EffectSubject
 from regeneration.battle.battler import Battler
 from regeneration.battle.command import CommandRequest, MoveCommand
 from regeneration.battle.moveeffect import MoveEffect
+from regeneration.battle.trainer import Trainer
 
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
@@ -143,6 +144,28 @@ class Field(EffectSubject):
         return dict(
                 id=id(self),
             )
+
+    # Load/Save
+
+    @classmethod
+    def load(cls, dct, loader, trainer_loader=Trainer.load, **kwargs):
+        loaded_trainers = {}
+        trainers = []
+        for trainer_ids in dct['battle_format']:
+            side = []
+            for trainer_id in trainer_ids:
+                try:
+                    trainer = loaded_trainers[trainer_id]
+                except KeyError:
+                    trainer = loaded_trainers[trainer_id] = trainer_loader(
+                            dct['trainers'][trainer_id], loader=loader)
+                side.append(trainer)
+            trainers.append(side)
+        if not trainers:
+            raise ValueErorr('No trainers')
+        if 'seed' in dct:
+            kwargs['rand'] = random.Random(dct['seed'])
+        return cls(loader, trainers, **kwargs)
 
     # Main logic
 
