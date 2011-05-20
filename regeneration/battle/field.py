@@ -11,6 +11,7 @@ from regeneration.battle.battler import Battler
 from regeneration.battle.command import CommandRequest, MoveCommand
 from regeneration.battle.moveeffect import MoveEffect
 from regeneration.battle.trainer import Trainer
+from regeneration.battle.helper_effects import default_effect_classes
 
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
@@ -85,6 +86,8 @@ class Field(EffectSubject):
         self.observers = []
 
         self.struggle = self.loader.load_struggle()
+
+        self.apply_default_effects()
 
     # Helpers
 
@@ -292,6 +295,10 @@ class Field(EffectSubject):
 
     # Mechanics
 
+    def apply_default_effects(self):
+        for effect_class in default_effect_classes:
+            self.give_effect_self(effect_class())
+
     def command_allowed(self, command, ignore_pp=False):
         if command.battler.fainted and command.command != 'switch':
             return False
@@ -418,25 +425,16 @@ class Field(EffectSubject):
             attack_stat = self.loader.load_stat('special-attack')
             defense_stat = self.loader.load_stat('special-defense')
 
-        attack = user.stats[attack_stat]
-        defense = user.stats[defense_stat]
-        damage = ((user.level * 2 // 5 + 2) *
-                hit.power * attack // 50 // defense)
-
         self.message.effectivity(hit=hit)
         if not hit.effectivity:
             return None
 
-        damage += 2
+        attack = user.stats[attack_stat]
+        defense = target.stats[defense_stat]
+        damage = ((user.level * 2 // 5 + 2) *
+                hit.power * attack // 50 // defense)
 
-        damage *= self.randint(217, 255, 'Randomizing move damage') * 100
-        damage = int(damage / 255)
-        damage = int(damage / 100)
-
-        if hit.type in user.types:
-            damage = int(damage * Fraction(3, 2))
-
-        damage = int(damage * hit.effectivity)
+        damage = Effect.modify_move_damage(self, damage, hit)
 
         if damage < 1:
             damage = 1

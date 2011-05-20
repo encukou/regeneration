@@ -88,9 +88,16 @@ class EffectSubject(object):
     def get_effect_methods(self, cls, attr):
         """Yields an attribute for all active effects of a given class.
         """
-        for effect in self.active_effects:
-            if cls is None or isinstance(effect, cls):
-                yield getattr(effect, attr)
+        def generator():
+            for effect in self.active_effects:
+                if cls is None or isinstance(effect, cls):
+                    yield getattr(effect, attr)
+        def key(callback):
+            try:
+                return callback.orderkey
+            except AttributeError:
+                return None
+        return sorted(generator(), key=key)
 
 def unique_effect(cls):
     """Decorator for unique effects; only one instance of such a class
@@ -115,13 +122,18 @@ class callback(object):
 
     The first argument must have a field attribute that gives the battlefield.
     """
-    def __init__(self, func):
+    def __init__(self, func, orderkey=None):
         self.func = func
         self.name = func.__name__
 
     def __get__(self, instance, owner):
         if instance:
-            return partial(self.func, instance)
+            pa = partial(self.func, instance)
+            try:
+                pa.orderkey = self.func.orderkey
+            except:
+                pa.orderkey = None
+            return pa
         else:
             return wraps(self.func)(partial(self.run_all, owner))
 
@@ -169,6 +181,15 @@ class Effect(object):
     def __init__(self):
         """Always call EffectSubject's methods to properly apply Effects!
         """
+
+    @staticmethod
+    def orderkey(key):
+        """Decorator to attach an order key to a callback
+        """
+        def _attach_orderkey(func):
+            func.orderkey = key
+            return func
+        return _attach_orderkey
 
     def reparent(self, new_subject):
         """Move the effect onto another subject.
@@ -305,4 +326,4 @@ class Effect(object):
     def speed_factor(self, field, speed_factor):
         """Modify the global speed factor
         """
-        return speedFactor
+        return speed_factor
