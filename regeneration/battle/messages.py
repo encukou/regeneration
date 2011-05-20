@@ -164,3 +164,31 @@ class PPChange(Message):
 class Fainted(Message):
     message = "{battler} fainted!"
     battler = MessageArgument()
+
+
+class EffectivityBase(Message):
+    hit = MessageArgument()
+
+class DidntAffect(EffectivityBase):
+    message = "It didn't affect {hit.target}."
+
+class NotVeryEffective(EffectivityBase):
+    message = "It's not very effective!"
+
+class NormallyEffective(EffectivityBase):
+    message = "It's normally effective!"
+    shown = False
+
+class SuperEffective(EffectivityBase):
+    message = "It's super effective!"
+
+def effectivity(hit, **kwargs):
+    if hit.effectivity == 0:
+        return DidntAffect(hit=hit, **kwargs)
+    elif hit.effectivity < 1:
+        return NotVeryEffective(hit=hit, **kwargs)
+    elif hit.effectivity == 1:
+        return NormallyEffective(hit=hit, **kwargs)
+    else:
+        return SuperEffective(hit=hit, **kwargs)
+

@@ -91,6 +91,7 @@ class TestMoveEffect(QuietTestCase):
         self.move = Object()
         self.move.power = 20
         self.move.type = Object()
+        self.move.type.damage_efficacies = []
         self.move.accuracy = 0.5
         self.move.damage_class = Object()
         self.move.targetting = Object()
@@ -100,11 +101,13 @@ class TestMoveEffect(QuietTestCase):
         self.user = Object()
         self.user.field = self.field
         self.user.fainted = False
+        self.user.types = []
         self.user.hp = 30
 
         self.target = Object()
         self.target.field = self.field
         self.target.fainted = False
+        self.target.types = []
         self.target.hp = 40
 
         self.moveeffect = moveeffect.MoveEffect(

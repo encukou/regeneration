@@ -25,7 +25,7 @@ class MessageSender(object):
         return partial(self.send, getattr(self.messages, attr))
 
     def send(self, cls, **kwargs):
-        self.field.send_message(cls(self.field, **kwargs))
+        self.field.send_message(cls(field=self.field, **kwargs))
 
 class Side(EffectSubject):
     def __init__(self, field, number, trainers):
@@ -423,6 +423,10 @@ class Field(EffectSubject):
         damage = ((user.level * 2 // 5 + 2) *
                 hit.power * attack // 50 // defense)
 
+        self.message.effectivity(hit=hit)
+        if not hit.effectivity:
+            return None
+
         damage += 2
 
         damage *= self.randint(217, 255, 'Randomizing move damage') * 100
@@ -431,6 +435,8 @@ class Field(EffectSubject):
 
         if hit.type in user.types:
             damage = int(damage * Fraction(3, 2))
+
+        damage = int(damage * hit.effectivity)
 
         if damage < 1:
             damage = 1

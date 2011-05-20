@@ -6,6 +6,7 @@ __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
 from regeneration.battle.effect import Effect
+from fractions import Fraction
 
 class _MoveEffectMetaclass(type):
     def __init__(cls, name, bases, dct):
@@ -161,3 +162,17 @@ class Hit(object):
         self.accuracy = move_effect.accuracy
         self.damage_class = move_effect.damage_class
         self.args = kwargs
+        self.effectivity = self._get_effectivity()
+
+    def _get_effectivity(self):
+        if not self.type:
+            return 1
+        effectivity = 1
+        efficacies = self.type.damage_efficacies
+        for type in self.target.types:
+            efficacy = [e for e in efficacies if e.target_type == type][0]
+            effectivity *= Fraction(efficacy.damage_factor, 100)
+        return effectivity
+
+    def message_values(self, trainer):
+        return self.move_effect.message_values(trainer)
