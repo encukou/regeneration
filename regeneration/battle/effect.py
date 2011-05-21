@@ -265,6 +265,12 @@ class Effect(object):
         """
         return
 
+    @callback
+    def withdraw(self, battler):
+        """Called when battler is withdrawn from battle (incl. after fainting)
+        """
+        return
+
     # Cancellers
 
     @callback

@@ -233,7 +233,8 @@ class Field(EffectSubject):
 
             self.state = 'waiting'
 
-        for battler in self.battlers:
+        for spot in self.spots:
+            battler = spot.battler
             request = self.active_requests.get(battler)
             if request:
                 command = battler.trainer.request_command(request)
@@ -279,11 +280,12 @@ class Field(EffectSubject):
             ]
 
         for command in commands:
-            self.withdraw(command.battler)
+            battler = command.battler
+            spot = battler.spot
+            self.withdraw(battler)
+            self.release_monster(spot, command.replacement)
         for command in commands:
-            self.release_monster(command.spot, command.replacement)
-        for command in commands:
-            self.init_battler(command.spot.battler)
+            self.init_battler(command.battler)
 
         self.ask_for_commands()
 
@@ -368,10 +370,12 @@ class Field(EffectSubject):
 
         for command in commands:
             battler = command.battler
+            spot = battler.spot
 
             self.message.SubturnStart(battler=battler, turn=self.turn_number)
             if command.command == 'move':
-                command.move_effect.attempt_use()
+                if not command.battler.fainted:
+                    command.move_effect.attempt_use()
             elif command.command == 'switch':
                 self.switch(command.request.spot, command.replacement)
             else:
@@ -446,15 +450,16 @@ class Field(EffectSubject):
         return damage
 
     def switch(self, spot, replacement):
-        self.withdraw(spot)
+        self.withdraw(spot.battler)
         self.release_monster(spot, replacement)
         self.init_battler(spot.battler)
 
-    def withdraw(self, spot):
+    def withdraw(self, battler):
         for effect in self.active_effects:
-            effect.withdraw(spot)
-        spot.battler.spot = None
-        spot.battler = None
+            effect.withdraw(battler)
+        if not battler.fainted:
+            self.message.Withdraw(battler=battler)
+        battler.spot.battler = None
 
     def release_monster(self, spot, monster):
         assert spot.battler is None

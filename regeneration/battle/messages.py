@@ -115,7 +115,11 @@ class Draw(BattleEnd):
         super(Draw, self).__init__(field, side=None)
 
 class SendOut(Message):
-    message = "{battler.spot.trainer} sends out {battler}"
+    message = "{battler.spot.trainer} sent out {battler}"
+    battler = MessageArgument()
+
+class Withdraw(Message):
+    message = "{battler.spot.trainer} withdrew {battler}"
     battler = MessageArgument()
 
 class TurnStart(Message):
