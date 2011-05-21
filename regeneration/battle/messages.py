@@ -192,3 +192,6 @@ def effectivity(hit, **kwargs):
     else:
         return SuperEffective(hit=hit, **kwargs)
 
+class Miss(Message):
+    message = "{hit.user}'s attack missed."
+    hit = MessageArgument()

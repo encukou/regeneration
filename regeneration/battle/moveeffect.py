@@ -75,6 +75,11 @@ class MoveEffect(object):
         """Signals failure"""
         return
 
+    def miss(self, hit):
+        """Move missed"""
+        self.field.message.Miss(hit=hit)
+        return
+
     def attempt_use(self, **kwargs):
         if Effect.prevent_use(self):
             return self.fail()
@@ -101,8 +106,10 @@ class MoveEffect(object):
         return not target.fainted
 
     def attempt_hit(self, hit):
-        if Effect.prevent_hit(hit) or not self.roll_accuracy(hit):
+        if Effect.prevent_hit(hit):
             return self.fail(hit)
+        elif not self.roll_accuracy(hit):
+            return self.miss(hit)
         return self.do_hit(hit)
 
     def roll_accuracy(self, hit):
