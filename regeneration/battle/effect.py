@@ -327,3 +327,9 @@ class Effect(object):
         """Modify the global speed factor
         """
         return speed_factor
+
+    @chain
+    def critical_hit_stage(self, field, stage):
+        """Modify the critical hit stage
+        """
+        return stage

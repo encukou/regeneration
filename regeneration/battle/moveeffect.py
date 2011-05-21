@@ -144,6 +144,17 @@ class MoveEffect(object):
             self.field.message.PPChange(move=self.move, battler=self.user,
                     delta=delta, pp=self.move.pp, cause=self)
 
+    def determine_critical_hit(self, hit):
+        stage = Effect.critical_hit_stage(self, 1)
+        rate = {
+                1: Fraction(1, 16),
+                2: Fraction(1, 8),
+                3: Fraction(1, 4),
+                4: Fraction(1, 3),
+                5: Fraction(1, 2),
+            }[min(stage, 5)]
+        hit.is_critical = self.field.flip_coin(rate, 'Determine critical hit')
+
     def message_values(self, trainer):
         if trainer == self.user.trainer and self.target:
             target = self.target.message_values(trainer)

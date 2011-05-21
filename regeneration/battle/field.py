@@ -429,6 +429,10 @@ class Field(EffectSubject):
         if not hit.effectivity:
             return None
 
+        hit.move_effect.determine_critical_hit(hit)
+        if hit.is_critical:
+            self.message.CriticalHit(hit=hit)
+
         attack = user.stats[attack_stat]
         defense = target.stats[defense_stat]
         damage = ((user.level * 2 // 5 + 2) *
