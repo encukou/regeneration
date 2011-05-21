@@ -18,6 +18,9 @@ __email__ = 'encukou@gmail.com'
 class FakeRand(object):
     """A random-like object that mostly returns zeroes – not random at all!
     """
+    def random(self):
+        return 0.0
+
     def randint(self, a, b):
         return 0
 

@@ -40,6 +40,7 @@ class TestTrainer(QuietTestCase):
         self.request.commands = lambda: [
                 command.MoveCommand(self.request, self.move),
             ]
+        self.request.moves = lambda: self.request.commands()
         self.request.battler = Object()
         self.request.field = Object()
         self.request.field.battlers = [self.request.battler]
@@ -65,7 +66,7 @@ class TestTrainer(QuietTestCase):
         self.check_move_result(result, target=None)
 
     def test_no_command(self):
-        with pytest.raises(AssertionError):
+        with pytest.raises(Exception):
             self.request.commands = lambda: []
             result = self.trainer.request_command(self.request)
 

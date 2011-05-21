@@ -46,9 +46,23 @@ class Trainer(object):
         The first allowed one is used by request_command.
         If none are allowed, request_command will select the first one
         from the request's list.
-        The base class implementation does nothing.
+
+        Note that returning an empty tuple is perfectly fine.
+
+        The base class implementation implements a very dumb random trainer
+        that might select any command (including, on rare occasions, running)
         """
-        return ()
+        moves = list(request.moves())
+        if moves and self.rand.random() < 0.9:
+            # 90% chance to just select a move
+            return [self.rand.choice(moves)]
+        else:
+            # 10% chance to select anything (incl. another move)
+            command = self.rand.choice(list(request.commands()))
+            if command.command == 'run' and self.rand.random() < .99:
+                # But only forfeit very rarely
+                return ()
+            return [command]
 
     def get_first_inactive_monster(self, exclude):
         """Return the first conscious team member that is not in exclude.
