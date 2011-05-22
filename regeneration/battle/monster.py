@@ -2,6 +2,7 @@
 # Encoding: UTF-8
 
 import random
+from fractions import Fraction
 
 from regeneration.battle.stats import Stats
 from regeneration.battle.gender import Gender
@@ -93,11 +94,12 @@ class Monster(object):
             if stat.identifier == 'hp':
                 result += level + 5
             else:
-                stat_identifier = stat.name.lower().replace(' ', '-')
+                nature_modifier = 1
                 if self.nature.increased_stat is pstat.stat:
-                    result = int(result * 1.1)
-                elif self.nature.decreased_stat is pstat.stat:
-                    result = int(result * 0.9)
+                    nature_modifier += Fraction(1, 10)
+                if self.nature.decreased_stat is pstat.stat:
+                    nature_modifier -= Fraction(1, 10)
+                result = int(result * nature_modifier)
             self.stats[stat] = result
         self.hp = self.stats.hp - missing_hp
         if self.hp < 0:
