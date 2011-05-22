@@ -399,20 +399,21 @@ class Field(EffectSubject):
         return commands
 
     def command_sort_order(self, command):
+        speed_stat = self.loader.load_stat('speed')
+        speed_value = command.request.battler.stats[speed_stat]
+        trick_factor = Effect.speed_factor(self, 1)
+        speed_sort_value = -speed_value * trick_factor
         if command.command == 'move':
-            trick_factor = Effect.speed_factor(self, 1)
-            speed_stat = self.loader.load_stat('speed')
-            speed_value = command.request.battler.stats[speed_stat]
             return (
                     1,
                     -command.move.priority,
-                    -speed_value * trick_factor,
+                    speed_sort_value,
                 )
         elif command.command == 'switch':
+            # XXX: Should switch-ins be sorted by speed?
             return (
                     0,
-                    command.request.spot.side.number,
-                    command.request.spot.number,
+                    speed_sort_value,
                 )
         else:
             raise NotImplementedError()
