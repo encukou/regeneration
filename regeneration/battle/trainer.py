@@ -86,7 +86,7 @@ class Trainer(object):
         """
         return ()
 
-    def message_values(self, public=False):
+    def message_values(self, private=True):
         return dict(
                 id=id(self),
                 name=self.name,

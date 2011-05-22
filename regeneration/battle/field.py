@@ -50,13 +50,13 @@ class Spot(object):
         self.side = side
         self.trainer = trainer
         self.battler = None
+        self.field = self.side.field
 
-    @property
-    def field(self):
-        return self.side.field
-
-    def message_values(self, public=False):
-        return self.battler.message_values(public=False)
+    def message_values(self, trainer):
+        return dict(
+                trainer=self.trainer.message_values(trainer),
+                side=self.side.message_values(trainer),
+            )
 
 class Field(EffectSubject):
     in_loop = False
@@ -139,7 +139,7 @@ class Field(EffectSubject):
         for observer in self.observers:
             observer(message)
 
-    def message_values(self, public=False):
+    def message_values(self, trainer):
         return dict(
                 id=id(self),
             )
@@ -165,7 +165,7 @@ class Field(EffectSubject):
                 reverse=True,
             )
         for spot, mon in sendouts:
-            self.init_monster(spot)
+            self.init_battler(spot.battler)
 
         self.state = 'waiting'
 
@@ -190,30 +190,31 @@ class Field(EffectSubject):
         self.active_requests = {}
         self.commands = {}
 
-        for battler in self.battlers:
+        for spot in self.spots:
+            battler = spot.battler
             if battler.fainted:
                 # Fainted! Has to send out new battler!
-                command_request = CommandRequest(self, spot)
-                self.active_requests[spot] = command_request
+                command_request = CommandRequest(battler)
+                self.active_requests[battler] = command_request
 
         if self.active_requests:
             self.state = 'waiting_replacements'
         else:
-            for spot in self.spots:
+            for battler in self.battlers:
                 # Any command they may like
-                command_request = CommandRequest(spot)
-                self.active_requests[spot] = command_request
+                command_request = CommandRequest(battler)
+                self.active_requests[battler] = command_request
 
             self.state = 'waiting'
 
-        for spot in self.spots:
-            request = self.active_requests.get(spot)
+        for battler in self.battlers:
+            request = self.active_requests.get(battler)
             if request:
-                command = spot.trainer.request_command(request)
+                command = battler.trainer.request_command(request)
                 if command is not None:
-                    self.commands[spot] = command
+                    self.commands[battler] = command
 
-        for spot, command in self.commands.items():
+        for battler, command in self.commands.items():
             self.command_selected(command, False)
 
     def command_loop(self):
@@ -228,11 +229,11 @@ class Field(EffectSubject):
         self.assert_state('waiting', 'waiting_replacements')
 
         try:
-            del self.active_requests[command.request.spot]
+            del self.active_requests[command.request.battler]
         except KeyError:
-            raise AssertionError("Not waiting for a command for that spot")
+            raise AssertionError("Not waiting for a command for that battler")
 
-        self.commands[command.request.spot] = command
+        self.commands[command.request.battler] = command
 
         if not self.active_requests:
             if self.state == 'waiting_replacements':
@@ -247,16 +248,16 @@ class Field(EffectSubject):
         self.assert_state('waiting_replacements')
 
         commands = [
-                command for command in self.commands.items()
+                command for command in self.commands.values()
                 if command.command == 'switch'
             ]
 
         for command in commands:
-            self.withdraw(command.spot)
+            self.withdraw(command.battler)
         for command in commands:
             self.release_monster(command.spot, command.replacement)
         for command in commands:
-            self.init_monster(command.spot)
+            self.init_battler(command.spot.battler)
 
         self.ask_for_commands()
 
@@ -300,7 +301,7 @@ class Field(EffectSubject):
                     # Note that this makes the result of command_allowed()
                     # dependent on commands already issued this turn
                     return False
-            battler = command.request.spot.battler
+            battler = command.request.battler
             if not battler or battler.fainted:
                 return True
             return not Effect.prevent_switch(command)
@@ -313,7 +314,7 @@ class Field(EffectSubject):
         self.assert_state('processing')
 
         commands = []
-        for spot, command in self.commands.items():
+        for battler, command in self.commands.items():
             if command.command == 'move' and command.battler.forced_move:
                 move, target = command.battler.forced_move
                 command = MoveCommand(command.request, 'move', move, target)
@@ -327,12 +328,11 @@ class Field(EffectSubject):
         move_effects = {}
 
         for command in commands:
-            battler = spot.battler
             if command.command == 'move':
                 command.move_effect = MoveEffect(
                         self,
                         command.move,
-                        command.request.spot,
+                        command.request.battler,
                         command.target)
                 command.move_effect.begin_turn()
 
@@ -346,7 +346,7 @@ class Field(EffectSubject):
                 self.switch(command.request.spot, command.replacement)
             else:
                 raise NotImplementedError(command)
-            self.message.SubturnEnd(battler=spot, turn=self.turn_number)
+            self.message.SubturnEnd(battler=battler, turn=self.turn_number)
             if self.check_win():
                 return
 
@@ -368,7 +368,7 @@ class Field(EffectSubject):
         if command.command == 'move':
             trick_factor = Effect.speed_factor(self, 1)
             speed_stat = self.loader.load_stat('speed')
-            speed_value = command.request.spot.battler.stats[speed_stat]
+            speed_value = command.request.battler.stats[speed_stat]
             return (
                     1,
                     -command.move.priority,
@@ -395,9 +395,9 @@ class Field(EffectSubject):
             attack_stat = self.loader.load_stat('special-attack')
             defense_stat = self.loader.load_stat('special-defense')
 
-        attack = user.battler.stats[attack_stat]
-        defense = user.battler.stats[defense_stat]
-        damage = ((user.battler.level * 2 // 5 + 2) *
+        attack = user.stats[attack_stat]
+        defense = user.stats[defense_stat]
+        damage = ((user.level * 2 // 5 + 2) *
                 hit.power * attack // 50 // defense)
 
         damage += 2
@@ -406,7 +406,7 @@ class Field(EffectSubject):
         damage = int(damage / 255)
         damage = int(damage / 100)
 
-        if hit.type in user.battler.types:
+        if hit.type in user.types:
             damage = int(damage * Fraction(3, 2))
 
         if damage < 1:
@@ -417,7 +417,7 @@ class Field(EffectSubject):
     def switch(self, spot, replacement):
         self.withdraw(spot)
         self.release_monster(spot, replacement)
-        self.init_monster(spot)
+        self.init_battler(spot.battler)
 
     def withdraw(self, spot):
         for effect in self.active_effects:
@@ -430,8 +430,8 @@ class Field(EffectSubject):
         spot.battler = Battler(monster, spot, self.loader)
         self.message.SendOut(battler=spot.battler)
 
-    def init_monster(self, spot):
-        for effect in spot.battler.active_effects:
+    def init_battler(self, battler):
+        for effect in battler.active_effects:
             effect.switchIn()
 
     def check_win(self):
@@ -443,7 +443,7 @@ class Field(EffectSubject):
         for side in self.sides:
             for spot in side.spots:
                 if (
-                        spot.battler and not spot.battler.fainted or
+                        (spot.battler and not spot.battler.fainted) or
                         spot.trainer.get_first_inactive_monster(
                                 [spot.battler for spot in self.spots]
                             )

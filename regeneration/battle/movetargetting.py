@@ -27,7 +27,7 @@ class MoveTargetting(object):
 
     @classmethod
     def targets(cls, move_effect, chosen_target):
-        """Returns a list of targetted spots.
+        """Returns a list of targetted battlers.
         moveEffect is the MoveEffect corresponding to this move's usage.
         chosenTarget is one of the targets from chooseList, if applicable.
         """
@@ -128,9 +128,9 @@ class TargetRandomOpponent(TargetSelectedOpponent):
         return [cls.random_choice(
                 move_effect.field,
                 [
-                        spot for spot in move_effect.field.spots
-                        if spot.side != move_effect.user.side and
-                                not spot.battler.fainted
+                        battler for battler in move_effect.field.battlers
+                        if battler.spot.side != move_effect.user.spot.side and
+                                not battler.fainted
                         ],
             )]
 
@@ -141,8 +141,8 @@ class TargetAllOthers(MoveTargetting):
     @classmethod
     def targets(cls, move_effect, chosen_target):
         return [
-                spot for spot in move_effect.field.spots
-                if spot != move_effect.user and not spot.battler.fainted
+                battler for battler in move_effect.field.battlers
+                if battler != move_effect.user and not battler.fainted
             ]
 
 @has_identifier('selected-pokemon')
@@ -152,9 +152,9 @@ class TargetAllOpponents(MoveTargetting):
     @classmethod
     def targets(cls, move_effect, chosen_target):
         return [
-                spot for spot in move_effect.field.spots
-                if spot.side != move_effect.user.side and
-                        not spot.battler.fainted
+                battler for battler in move_effect.field.battlers
+                if battler.spot.side != move_effect.user.spot.side and
+                        not battler.fainted
             ]
 
 @has_identifier('all-opponents')

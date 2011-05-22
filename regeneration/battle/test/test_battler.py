@@ -19,6 +19,7 @@ class FakeRand(object):
 
 class FakeSpot(object):
     field = None
+    trainer = None
 
 @quiet
 def test_battler():

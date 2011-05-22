@@ -9,8 +9,7 @@ __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
 class MessageArgument(object):
-    def __init__(self, public=True):
-        self.public = public
+    pass
 
 class MessageMeta(Mapping.__metaclass__):
     def __new__(meta, name, bases, attrs):
@@ -46,23 +45,19 @@ class Message(Mapping):
         if kwargs:
             raise ValueError("Extra keyword arguments: %s" % ', '.join(kwargs))
 
-    def contents(self, public=False):
+    def contents(self, trainer=None):
         try:
-            return self._contents[public]
+            return self._contents[trainer]
         except KeyError:
             contents = dict()
             for name, arg_type in self.argument_types.items():
-                if arg_type.public or not public:
-                    value = self.arguments[name]
-                    if isinstance(value, (int, bool, unicode)):
-                        contents[name] = value
-                    else:
-                        contents[name] = value.message_values(public or None)
+                value = self.arguments[name]
+                if isinstance(value, (int, bool, unicode)):
+                    contents[name] = value
                 else:
-                    contents[name] = None
-            contents['public'] = public
+                    contents[name] = value.message_values(trainer)
             contents['class'] = self._classname
-            self._contents[public] = contents
+            self._contents[trainer] = contents
             return contents
 
     def __getattr__(self, attr):
@@ -101,7 +96,7 @@ class _ValueProxy(object):
         return "<%s>" % self.dict
 
     def __unicode__(self):
-        return self.name
+        return self.dict.get('name', '<?>')
 
 
 class BattleStart(Message):
@@ -116,11 +111,11 @@ class Victory(BattleEnd):
 
 class Draw(BattleEnd):
     message = "It's a draw!"
-    def __init__(self):
-        self.side = None
+    def __init__(self, field):
+        super(Draw, self).__init__(field, side=None)
 
 class SendOut(Message):
-    message = "{battler.trainer} sends out {battler}"
+    message = "{battler.spot.trainer} sends out {battler}"
     battler = MessageArgument()
 
 class TurnStart(Message):

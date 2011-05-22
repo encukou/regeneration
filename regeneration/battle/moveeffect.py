@@ -97,7 +97,7 @@ class MoveEffect(object):
         return self.targetting.targets(self, self.target)
 
     def targettable(self, target, **kwargs):
-        return not target.battler.fainted
+        return not target.fainted
 
     def attempt_hit(self, hit):
         if Effect.prevent_hit(hit) or not self.roll_accuracy(hit):
@@ -123,7 +123,7 @@ class MoveEffect(object):
     def do_damage(self, hit):
         hit.damage = self.calculate_damage(hit)
         hit.damage = Effect.modify_move_damage(self, hit.damage, hit)
-        hit.target.battler.do_damage(hit.damage, direct=True)
+        hit.target.do_damage(hit.damage, direct=True)
         Effect.damage_done(hit.target, hit.damage)
 
     def calculate_damage(self, hit):
@@ -137,13 +137,17 @@ class MoveEffect(object):
             self.field.message.PPChange(move=self.move, battler=self.user,
                     delta=delta, pp=self.move.pp, cause=self)
 
-    def message_values(self, public=False):
+    def message_values(self, trainer):
+        if trainer == self.user.trainer and self.target:
+            target = self.target.message_values(trainer)
+        else:
+            target = None
         return dict(
                 id=id(self),
                 name=self.move.name,
-                move=self.move.message_values(public),
-                user=self.user.message_values(public),
-                target=public and self.target.message_values(public),
+                move=self.move.message_values(trainer),
+                user=self.user.message_values(trainer),
+                target=target,
             )
 
 class Hit(object):

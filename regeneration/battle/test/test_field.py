@@ -4,9 +4,9 @@
 from regeneration.battle.example import loader
 from regeneration.battle.test import QuietTestCase, FakeRand
 
-from regeneration.battle import field
-from regeneration.battle import trainer
-from regeneration.battle import monster
+from regeneration.battle.field import Field
+from regeneration.battle.trainer import Trainer
+from regeneration.battle.monster import Monster
 
 __copyright__ = 'Copyright 2011, Petr Viktorin'
 __license__ = 'MIT'
@@ -18,25 +18,9 @@ class Object(object):
 fake_rand = FakeRand()
 
 class TestField(QuietTestCase):
-    def setup_method(self, m):
-        super(TestField, self).setup_method(m)
-
-        red = trainer.Trainer(
-                'red',
-                [self.make_monster() for i in range(2)],
-                rand = fake_rand,
-            )
-
-        blue = trainer.Trainer(
-                'blue',
-                [self.make_monster() for i in range(2)],
-                rand = fake_rand,
-            )
-
-        self.field = field.Field(loader, [[red], [blue]], rand=fake_rand)
 
     def make_monster(self):
-        return monster.Monster(
+        return Monster(
                 form=loader.load_form(u'porygon'),
                 level=50,
                 loader=loader,
@@ -44,4 +28,17 @@ class TestField(QuietTestCase):
             )
 
     def test_field(self):
-        self.field.run()
+        red = Trainer(
+                'red',
+                [self.make_monster() for i in range(2)],
+                rand = fake_rand,
+            )
+
+        blue = Trainer(
+                'blue',
+                [self.make_monster() for i in range(2)],
+                rand = fake_rand,
+            )
+
+        field = Field(loader, [[red], [blue]], rand=fake_rand)
+        field.run()

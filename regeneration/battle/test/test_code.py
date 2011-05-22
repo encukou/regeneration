@@ -74,12 +74,12 @@ def test_style(name, filename):
                 "%s: Missing/bad MIT license (use 'MIT', with single quotes)" %
                     filename
             )
-        assert '2010' not in file_props.get('copyright', '')
+        assert '2011' in file_props.get('copyright', '')
 
 bad_word_re = re.compile('pok.{1,2}(mon|dex|ball)|p(arameter|kmn)', re.I)
 @for_all_files
 def test_terminology(name, filename):
-    if name in 'example movetargetting'.split():
+    if name in 'example movetargetting testbattle'.split():
         return
     for lineno, line in enumerate(open(filename), 1):
         if line.strip() == 'CHECK@END':

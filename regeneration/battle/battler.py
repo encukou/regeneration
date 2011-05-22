@@ -39,6 +39,8 @@ class Battler(EffectSubject):
         self.level = monster.level
         self.types = monster.types
 
+        self.trainer = spot.trainer
+
     @property
     def fainted(self):
         return self.hp <= 0
@@ -91,11 +93,16 @@ class Battler(EffectSubject):
         if self.hp <= 0:
             self.field.message.Fainted(battler=self)
 
-    def message_values(self, public=False):
+    def message_values(self, trainer):
+        hp_fraction = Fraction(self.hp, self.stats.hp).limit_denominator(48)
+        if trainer == self.trainer:
+            hp = self.hp
+        else:
+            hp = None
         return dict(
                 id=id(self.monster),
                 name=self.name,
-                hp_fraction=Fraction(
-                        self.hp, self.stats.hp).limit_denominator(48),
-                trainer=public or self.spot.trainer.message_values(public=True)
+                hp_fraction=[hp_fraction.numerator, hp_fraction.denominator],
+                hp=hp,
+                spot=self.spot.message_values(trainer)
             )

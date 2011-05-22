@@ -99,15 +99,13 @@ class TestMoveEffect(QuietTestCase):
 
         self.user = Object()
         self.user.field = self.field
-        self.user.battler = Object()
-        self.user.battler.fainted = False
-        self.user.battler.hp = 30
+        self.user.fainted = False
+        self.user.hp = 30
 
         self.target = Object()
         self.target.field = self.field
-        self.target.battler = Object()
-        self.target.battler.fainted = False
-        self.target.battler.hp = 40
+        self.target.fainted = False
+        self.target.hp = 40
 
         self.moveeffect = moveeffect.MoveEffect(
                 field=self.field,
@@ -117,7 +115,7 @@ class TestMoveEffect(QuietTestCase):
             )
 
     def assert_changes(self, hp=40, pp=5):
-        assert self.target.battler.hp == hp
+        assert self.target.hp == hp
         assert self.move.pp == pp
 
     def test_move_effect(self):
@@ -167,4 +165,4 @@ class TestMoveEffect(QuietTestCase):
         assert hitA.target == self.target
         assert hitB.target == self.user
         self.assert_changes(hp=30, pp=4)
-        assert self.user.battler.hp == 20
+        assert self.user.hp == 20

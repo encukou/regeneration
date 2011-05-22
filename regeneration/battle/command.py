@@ -101,8 +101,9 @@ class CommandRequest(object):
     switches, etc., and a commands() that includes them all. Only legal
     commands are returned.
     """
-    def __init__(self, spot):
-        self.spot = spot
+    def __init__(self, battler):
+        self.battler = battler
+        self.spot = battler.spot
 
     def moves(self, moves=None):
         if not self.battler:
@@ -157,7 +158,3 @@ class CommandRequest(object):
     @property
     def field(self):
         return self.spot.field
-
-    @property
-    def battler(self):
-        return self.spot.battler

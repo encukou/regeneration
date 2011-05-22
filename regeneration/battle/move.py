@@ -71,9 +71,8 @@ class Move(object):
     def type(self):
         return self.kind.type
 
-    def message_values(self, public=False):
+    def message_values(self, trainer):
         return dict(
-                id=id(self),
                 name=self.name,
                 identifier=self.kind.identifier,
             )

@@ -52,7 +52,7 @@ class TestCommand(QuietTestCase):
         self.battler = battler.Battler(self.bulba, FakeSpot(), loader)
         self.battler.spot.battler = self.battler
 
-        self.request = command.CommandRequest(self.battler.spot)
+        self.request = command.CommandRequest(self.battler)
 
     @quiet
     def test_move_commands(self):
