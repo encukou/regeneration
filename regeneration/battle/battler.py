@@ -82,3 +82,12 @@ class Battler(EffectSubject):
     def set_move(self, i, kind):
         self.moves = list(self.moves)
         self.moves[i] = Move(kind)
+
+    def message_values(self, public=False):
+        return dict(
+                id=id(self.monster),
+                name=self.name,
+                hp_fraction=Fraction(
+                        self.hp, self.stats.hp).limit_denominator(48),
+                trainer=public or self.spot.trainer.message_values(public=True)
+            )

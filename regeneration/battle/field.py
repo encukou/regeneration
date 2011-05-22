@@ -41,6 +41,9 @@ class Side(EffectSubject):
     def __str__(self):
         return "<Side %s>" % self.number
 
+    def message_values(self, public=False):
+        return dict(id=id(self), name='Side %s' % self.number)
+
 class Spot(object):
     def __init__(self, side, number, trainer):
         self.number = number
@@ -51,6 +54,9 @@ class Spot(object):
     @property
     def field(self):
         return self.side.field
+
+    def message_values(self, public=False):
+        return self.battler.message_values(public=False)
 
 class Field(EffectSubject):
     in_loop = False
@@ -132,6 +138,11 @@ class Field(EffectSubject):
     def send_message(self, message):
         for observer in self.observers:
             observer(message)
+
+    def message_values(self, public=False):
+        return dict(
+                id=id(self),
+            )
 
     # Main logic
 

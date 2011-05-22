@@ -23,10 +23,10 @@ class Stats(dict):
             (as given by rand)
         Otherwise, they will all get set to min, or 0 by default.
         """
+        self._stat_objects = stat_objects
         try:
             dict.__init__(self, stat_objects)
         except TypeError:
-            self._stat_objects = stat_objects
             for stat in stat_objects:
                 if max is None:
                     self[stat] = min

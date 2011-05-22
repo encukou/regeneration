@@ -85,3 +85,9 @@ class Trainer(object):
         """Yield targets in order of preference. Similar to getCommands.
         """
         return ()
+
+    def message_values(self, public=False):
+        return dict(
+                id=id(self),
+                name=self.name,
+            )
