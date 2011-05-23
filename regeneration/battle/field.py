@@ -61,13 +61,14 @@ class Spot(object):
             )
 
 class Field(EffectSubject):
-    in_loop = False
-    turn_number = 0
+    BattlerClass = Battler
+    message_module = messages
+
     allow_run = True
 
     state = 'new'
 
-    def __init__(self, loader, trainers, messages=messages, rand=random):
+    def __init__(self, loader, trainers, rand=random):
         """ Make a Battlefield, pitting the given trainers against each other!
 
         trainers is a list of lists of trainers, grouped by side.
@@ -80,7 +81,7 @@ class Field(EffectSubject):
         EffectSubject.__init__(self, self)
         self.loader = loader
         self.rand = rand
-        self.message = MessageSender(self, messages)
+        self.message = MessageSender(self, self.message_module)
         self.sides = [Side(self, i, t) for i, t in enumerate(trainers)]
 
         self.observers = []
@@ -88,6 +89,9 @@ class Field(EffectSubject):
         self.struggle = self.loader.load_struggle()
 
         self.apply_default_effects()
+
+        self.in_loop = False
+        self.turn_number = 0
 
     # Helpers
 
@@ -347,9 +351,6 @@ class Field(EffectSubject):
 
         commands = []
         for battler, command in self.commands.items():
-            if command.command == 'move' and command.battler.forced_move:
-                move, target = command.battler.forced_move
-                command = MoveCommand(command.request, 'move', move, target)
             commands.append(command)
 
         self.message.TurnStart(turn=self.turn_number)
@@ -361,9 +362,7 @@ class Field(EffectSubject):
 
         for command in commands:
             if command.command == 'move':
-                command.move_effect = MoveEffect(
-                        self,
-                        command.move,
+                command.move_effect = command.move.get_effect(
                         command.request.battler,
                         command.target)
                 command.move_effect.begin_turn()
@@ -464,8 +463,9 @@ class Field(EffectSubject):
 
     def release_monster(self, spot, monster):
         assert spot.battler is None
-        spot.battler = Battler(monster, spot, self.loader)
-        self.message.SendOut(battler=spot.battler)
+        spot.battler = battler = self.BattlerClass(monster, spot, self.loader)
+        self.message.SendOut(battler=battler)
+        Effect.send_out(battler)
 
     def init_battler(self, battler):
         for effect in battler.active_effects:
@@ -520,3 +520,6 @@ class Field(EffectSubject):
 
     def shuffle(self, list, blurb):
         self.rand.shuffle(list)
+
+    def random_choice(self, list, blurb):
+        return list[self.randint(0, len(list) - 1, blurb)]

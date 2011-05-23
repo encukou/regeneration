@@ -3,6 +3,7 @@
 
 from fractions import Fraction
 
+from regeneration.battle.moveeffect import MoveEffect
 from regeneration.battle.movetargetting import MoveTargetting
 
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
@@ -76,6 +77,9 @@ class Move(object):
                 name=self.name,
                 identifier=self.kind.identifier,
             )
+
+    def get_effect(self, user, target):
+        return MoveEffect(self, user, target)
 
 class MoveFlags(object):
     def __init__(self, kind):

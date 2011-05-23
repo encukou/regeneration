@@ -111,7 +111,6 @@ class TestMoveEffect(QuietTestCase):
         self.target.hp = 40
 
         self.moveeffect = moveeffect.MoveEffect(
-                field=self.field,
                 move=self.move,
                 user=self.user,
                 target=self.target,

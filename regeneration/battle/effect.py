@@ -193,7 +193,6 @@ class Effect(object):
 
     def reparent(self, new_subject):
         """Move the effect onto another subject.
-        This is only for quick hacks, and generally shouldn't be used.
         """
         self.subject.effects = [
                 e for e
@@ -231,7 +230,7 @@ class Effect(object):
 
     @callback
     def effect_removed(self, effect):
-        """Called when this effect is removed.
+        """Called when an effect is removed.
         """
         return
 
@@ -262,6 +261,12 @@ class Effect(object):
     @callback
     def begin_turn(self, turn_number):
         """Called when a turn begins
+        """
+        return
+
+    @callback
+    def send_out(self, battler):
+        """Called when battler is sent to battle
         """
         return
 

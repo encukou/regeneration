@@ -13,6 +13,8 @@ __email__ = 'encukou@gmail.com'
 class Trainer(object):
     """A base class for a Trainer
     """
+    MonsterClass = Monster
+
     def __init__(self, name, team, rand=random):
         self.name = name
         self.team = team
@@ -108,9 +110,10 @@ class Trainer(object):
             rand = random.Random(dct['seed'])
         else:
             rand = random
+        monster_class = kwargs.pop('monster_class', cls.MonsterClass)
         return cls(
                 name=dct['name'],
-                team=[Monster.load(d, loader) for d in dct['team']],
+                team=[monster_class.load(d, loader) for d in dct['team']],
                 rand=rand,
                 **kwargs)
 

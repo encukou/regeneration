@@ -203,3 +203,9 @@ class Miss(Message):
 class CriticalHit(Message):
     message = "A critical hit!"
     hit = MessageArgument()
+
+
+class GainAbility(Message):
+    battler = MessageArgument()
+    ability = MessageArgument()
+

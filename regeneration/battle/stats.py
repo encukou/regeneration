@@ -34,6 +34,7 @@ class Stats(dict):
                     self[stat] = rand.randint(min, max)
 
     def _stat_by_identifier(self, identifier):
+        identifier = identifier.replace('_', '-')
         return [s for s in self._stat_objects if s.identifier == identifier][0]
 
     def __getattr__(self, attr):

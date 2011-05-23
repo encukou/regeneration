@@ -50,10 +50,10 @@ class MoveEffect(object):
 
     ppless = Flag('ppless')
 
-    def __init__(self, field, move, user, target):
+    def __init__(self, move, user, target):
         self.move = move
         self.power = move.power
-        self.field = field
+        self.field = user.field
         self.user = user
         self.target = target
         self.type = move.type
@@ -69,7 +69,7 @@ class MoveEffect(object):
         return None
 
     def copy_to_user(self, user):
-        return type(self)(self.field, self.move, user, self.target)
+        return type(self)(self.move, user, self.target)
 
     def fail(self, hit=None):
         """Signals failure"""
@@ -131,7 +131,7 @@ class MoveEffect(object):
     def do_damage(self, hit):
         hit.damage = self.calculate_damage(hit)
         hit.target.do_damage(hit.damage, direct=True)
-        Effect.damage_done(hit.target, hit.damage)
+        Effect.move_damage_done(hit.target, hit.damage)
 
     def calculate_damage(self, hit):
         # This is too mechanic-specific to have in MoveEffect

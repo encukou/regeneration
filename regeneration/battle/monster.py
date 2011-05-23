@@ -26,6 +26,7 @@ class Monster(object):
 
     If genes, effort, or nature are changed, be sure to call recalculateStats().
     """
+    MoveClass = Move
 
     def __init__(self, form, level, loader, rand=random, _load_moves=True):
         """ Create a random Monster of the given species and level.
@@ -39,7 +40,7 @@ class Monster(object):
         """
 
         self.form = form
-        self.kind = form.monster
+        self.kind = self.get_kind(form)
         self.species = form.species
         self.level = level
 
@@ -73,8 +74,11 @@ class Monster(object):
 
         self.ability = rand.choice(self.kind.abilities)
 
+    def get_kind(self, form):
+        return form.monster
+
     def set_moves(self, kinds):
-        self.moves = [Move(kind) for kind in kinds]
+        self.moves = [self.MoveClass(kind) for kind in kinds]
 
     def set_move(self, i, kind):
         self.moves[i] = Move(kind)
@@ -216,7 +220,7 @@ class Monster(object):
             rv.status = get('status')
         if 'moves' in dct:
             rv.moves = [
-                    Move(
+                    rv.MoveClass(
                         loader.load_move(move_info['kind']),
                         move_info.get('pp', None),
                     )

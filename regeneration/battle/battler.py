@@ -8,6 +8,7 @@ from functools import partial
 from regeneration.battle.effect import Effect, EffectSubject
 from regeneration.battle.stats import Stats
 from regeneration.battle.move import Move
+from regeneration.battle import messages
 
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
@@ -21,14 +22,13 @@ class Battler(EffectSubject):
     Monster, but keeps volatile things (stat/ability/move changes) to itself,
     to be forgotten when a battle ends.
     """
-    forced_move = None
-
     def __init__(self, monster, spot, loader):
         EffectSubject.__init__(self, spot.field)
         self.monster = monster
         self.species = monster.species
         self.spot = spot
 
+        self.ability_effect = None
         self.ability = monster.ability
 
         self.stats = Stats(monster.stats)
@@ -40,6 +40,9 @@ class Battler(EffectSubject):
         self.types = monster.types
 
         self.trainer = spot.trainer
+
+        self.item_effect = None
+        self.item = self.item
 
     @property
     def fainted(self):
@@ -80,18 +83,38 @@ class Battler(EffectSubject):
     @item.setter
     def item(self, new_item):
         self.monster.item = new_item
+        if self.item_effect:
+            self.item_effect.remove()
+        self.item_effect = self.give_effect_self(self.get_item_effect())
+
+    @property
+    def ability(self):
+        return self._ability
+
+    @ability.setter
+    def ability(self, new_ability):
+        self._ability = new_ability
+        if self.ability_effect:
+            self.ability_effect.remove()
+        self.ability_effect = self.give_effect_self(self.get_ability_effect())
 
     def set_move(self, i, kind):
         self.moves = list(self.moves)
         self.moves[i] = Move(kind)
 
-    def do_damage(self, damage, direct=False):
+    def do_damage(self, damage, direct=False, message_class=messages.HPChange):
         self.hp -= damage
         Effect.damage_done(self, damage)
-        self.field.message.HPChange(battler=self, direct=direct,
+        self.field.message(message_class, battler=self, direct=direct,
                 delta=-damage, hp=self.hp)
         if self.hp <= 0:
             self.field.message.Fainted(battler=self)
+
+    def get_ability_effect(self):
+        return None
+
+    def get_item_effect(self):
+        return None
 
     def message_values(self, trainer):
         hp_fraction = Fraction(self.hp, self.stats.hp).limit_denominator(48)
