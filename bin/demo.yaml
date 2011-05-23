@@ -1,0 +1,74 @@
+battle_format:
+- [0]
+- [1]
+seed: 3838812879413996544
+trainers:
+  0:
+    name: Red
+    seed: 3642476193134355411
+    team:
+    - level: 50
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-1
+      species: monster
+      stats: {attack: 78, defense: 86, hp: 142, special-attack: 108, special-defense: 86, speed: 62}
+    - level: 86
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-2
+      species: monster
+      stats: {attack: 114, defense: 152, hp: 240, special-attack: 184, special-defense: 163, speed: 100}
+    - level: 56
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-3
+      species: monster
+      stats: {attack: 106, defense: 85, hp: 152, special-attack: 113, special-defense: 93, speed: 66}
+    - level: 87
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-4
+      species: monster
+      stats: {attack: 150, defense: 129, hp: 234, special-attack: 185, special-defense: 157, speed: 94}
+    - level: 72
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-5
+      species: monster
+      stats: {attack: 107, defense: 117, hp: 210, special-attack: 151, special-defense: 126, speed: 103}
+    - level: 91
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-6
+      species: monster
+      stats: {attack: 108, defense: 164, hp: 224, special-attack: 204, special-defense: 155, speed: 92}
+  1:
+    name: Blue
+    seed: 1342221147698330225
+    team:
+    - level: 76
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-7
+      species: monster
+      stats: {attack: 111, defense: 143, hp: 197, special-attack: 134, special-defense: 134, speed: 94}
+    - level: 68
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-8
+      species: monster
+      stats: {attack: 102, defense: 107, hp: 180, special-attack: 122, special-defense: 130, speed: 95}
+    - level: 64
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-9
+      species: monster
+      stats: {attack: 110, defense: 126, hp: 167, special-attack: 127, special-defense: 115, speed: 54}
+    - level: 67
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-10
+      species: monster2
+      stats: {attack: 128, defense: 139, hp: 218, special-attack: 159, special-defense: 159, speed: 84}
+    - level: 93
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-11
+      species: monster
+      stats: {attack: 135, defense: 164, hp: 243, special-attack: 173, special-defense: 170, speed: 111}
+    - level: 63
+      moves: [{kind: tackle, pp: 56}]
+      nickname: Minion-12
+      species: monster
+      stats: {attack: 100, defense: 96, hp: 164, special-attack: 125, special-defense: 126, speed: 54}
+
