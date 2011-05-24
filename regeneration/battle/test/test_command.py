@@ -48,6 +48,7 @@ class TestCommand(QuietTestCase):
     def setup_method(self, m):
         super(TestCommand, self).setup_method(m)
         self.monster = monster.Monster(self.species, 30, loader, rand=FakeRand())
+        self.monster.hp = 1
         self.battler = battler.Battler(self.monster, FakeSpot(), loader)
         self.battler.spot.battler = self.battler
 

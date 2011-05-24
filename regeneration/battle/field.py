@@ -415,7 +415,7 @@ class Field(EffectSubject):
                     speed_sort_value,
                 )
         else:
-            raise NotImplementedError()
+            raise NotImplementedError(command.command)
 
     def calculate_damage(self, hit):
         damage_class = hit.damage_class

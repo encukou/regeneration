@@ -17,7 +17,7 @@ class MoveTargetting(object):
         return cls._id_map[identifier]
 
     @classmethod
-    def choice_list(cls, user, combatants):
+    def choice_list(cls, user):
         """Returns an iterable of targets to choose from.
         If empty, or has only one item, no choosing is needed.
         user is the user of the move.
@@ -75,8 +75,8 @@ class TargetSelectedOpponent(MoveTargetting):
     needs_selected_target = True
 
     @classmethod
-    def choose_list(cls, user, combatants):
-        return [b for b in combatants if b != user and not b.battler.fainted]
+    def choice_list(cls, user):
+        return user.allies + user.opponents
 
 @has_identifier('ally')
 class TargetAlly(MoveTargetting):
@@ -84,11 +84,8 @@ class TargetAlly(MoveTargetting):
     needs_selected_target = True
 
     @classmethod
-    def choose_list(cls, user, combatants):
-        return [
-                b for b in combatants
-                if b.side == b.side and b != user
-            ]
+    def choice_list(cls, user):
+        return user.allies
 
 @has_identifier('users-field')
 class TargetUserSide(MoveTargetting):
@@ -99,17 +96,14 @@ class TargetUserSide(MoveTargetting):
 @has_identifier('user-or-ally')
 class TargetUserOrAlly(MoveTargetting):
     @classmethod
-    def choice_list(cls, user, combatants):
-        return [b for b in combatants if b.side == user.side]
+    def choice_list(cls, user):
+        return user + [user.allies]
 
 @has_identifier('opponents-field')
 class TargetOpponentSide(MoveTargetting):
     @classmethod
-    def choice_list(cls, user, combatants):
-        return [
-                b for b in combatants
-                if b.side != user.side
-            ]
+    def choice_list(cls, user):
+        return user.opponents
 
     @classmethod
     def affected_areas(cls, move_effect, targets):
@@ -122,17 +116,10 @@ class TargetUser(MoveTargetting):
         return [move_effect.user]
 
 @has_identifier('random-opponent')
-class TargetRandomOpponent(TargetSelectedOpponent):
+class TargetRandomOpponent(MoveTargetting):
     @classmethod
     def targets(cls, move_effect, chosen_target):
-        return [cls.random_choice(
-                move_effect.field,
-                [
-                        battler for battler in move_effect.field.battlers
-                        if battler.spot.side != move_effect.user.spot.side and
-                                not battler.fainted
-                        ],
-            )]
+        return [cls.random_choice(move_effect.field, user.opponents)]
 
 @has_identifier('all-others')
 class TargetAllOthers(MoveTargetting):
@@ -140,10 +127,7 @@ class TargetAllOthers(MoveTargetting):
 
     @classmethod
     def targets(cls, move_effect, chosen_target):
-        return [
-                battler for battler in move_effect.field.battlers
-                if battler != move_effect.user and not battler.fainted
-            ]
+        return move_effect.user.opponents + move_effect.allies
 
 @has_identifier('all-opponents')
 class TargetAllOpponents(MoveTargetting):
@@ -151,11 +135,7 @@ class TargetAllOpponents(MoveTargetting):
 
     @classmethod
     def targets(cls, move_effect, chosen_target):
-        return [
-                battler for battler in move_effect.field.battlers
-                if battler.spot.side != move_effect.user.spot.side and
-                        not battler.fainted
-            ]
+        return move_effect.user.opponents
 
 @has_identifier('entire-field')
 class TargetField(MoveTargetting):

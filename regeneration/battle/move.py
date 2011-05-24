@@ -34,10 +34,13 @@ class Move(object):
         self.kind = kind
         self.pp = self.maxpp = maxpp
 
-        self.targetting = MoveTargetting.by_identifier(kind.target.identifier)
+        self.targetting = self.get_targetting(kind.target.identifier)
 
         # We like convenient-er accessors to common things
         self.flags = MoveFlags(kind)
+
+    def get_targetting(self, identifier):
+        return MoveTargetting.by_identifier(identifier)
 
     def __str__(self):
         return "%s (%s/%s PP)" % (self.kind.identifier, self.pp, self.maxpp)

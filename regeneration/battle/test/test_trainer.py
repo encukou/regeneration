@@ -34,7 +34,7 @@ class TestTrainer(QuietTestCase):
 
         self.move = Object()
         self.move.targetting = Object()
-        self.move.targetting.choice_list = lambda u, b: ['c', 'd']
+        self.move.targetting.choice_list = lambda u: ['c', 'd']
 
         self.request = Object()
         self.request.commands = lambda: [
@@ -56,12 +56,12 @@ class TestTrainer(QuietTestCase):
         self.check_move_result(result, target=None)
 
     def test_one_target(self):
-        self.move.targetting.choice_list = lambda u, b: ['e']
+        self.move.targetting.choice_list = lambda u: ['e']
         result = self.trainer.request_command(self.request)
         self.check_move_result(result, target='e')
 
     def test_no_target(self):
-        self.move.targetting.choice_list = lambda u, b: []
+        self.move.targetting.choice_list = lambda u: []
         result = self.trainer.request_command(self.request)
         self.check_move_result(result, target=None)
 

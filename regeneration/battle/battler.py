@@ -98,6 +98,16 @@ class Battler(EffectSubject):
             self.ability_effect.remove()
         self.ability_effect = self.give_effect_self(self.get_ability_effect())
 
+    @property
+    def opponents(self):
+        return [battler for battler in self.field.battlers
+                if battler.spot.side != self.spot.side]
+
+    @property
+    def allies(self):
+        return [battler for battler in self.field.battlers
+                if battler.spot.side == self.spot.side and battler is not self]
+
     def set_move(self, i, kind):
         self.moves = list(self.moves)
         self.moves[i] = Move(kind)
@@ -129,3 +139,6 @@ class Battler(EffectSubject):
                 hp=hp,
                 spot=self.spot.message_values(trainer)
             )
+
+    def __repr__(self):
+        return "<Battler: %s's %s>" % (self.trainer.name, self.monster)

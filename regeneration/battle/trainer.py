@@ -94,7 +94,8 @@ class Trainer(object):
         """Choose a target for a command. Similar to requestCommand.
         """
         for target in itertools.chain(
-                self.get_targets(command),
+                (t for t in self.get_targets(command)
+                    if t in command.possible_targets),
                 command.possibleTargets,
             ):
             return target

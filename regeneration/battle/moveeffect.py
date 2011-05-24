@@ -100,7 +100,7 @@ class MoveEffect(object):
                 yield Hit(self, target, **kwargs)
 
     def targets(self, **kwargs):
-        return self.targetting.targets(self, self.target)
+        return self.targetting.targets(self, self.target.spot.battler)
 
     def targettable(self, target, **kwargs):
         return not target.fainted

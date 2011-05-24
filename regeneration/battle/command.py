@@ -48,14 +48,15 @@ class MoveCommand(Command):
 
     @property
     def possible_targets(self):
-        return self.move.targetting.choice_list(
-                self.request.battler,
-                self.field.battlers,
-            )
+        return self.move.targetting.choice_list(self.request.battler)
 
     @property
     def args(self):
         return self.move, self.target
+
+    def __repr__(self):
+        return "<MoveCommand: %s's %s on %s>" % (self.battler, self.move,
+                self.target)
 
 class SwitchCommand(Command):
     command = 'switch'
@@ -106,7 +107,7 @@ class CommandRequest(object):
         self.spot = battler.spot
 
     def moves(self, moves=None):
-        if not self.battler:
+        if not self.battler or self.battler.fainted:
             return
         if moves is None:
             moves = self.battler.moves
