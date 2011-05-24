@@ -187,7 +187,7 @@ class Hit(object):
         effectivity = 1
         efficacies = self.type.damage_efficacies
         for type in self.target.types:
-            efficacy = [e for e in efficacies if e.target_type == type][0]
+            efficacy, = [e for e in efficacies if e.target_type == type]
             effectivity *= Fraction(efficacy.damage_factor, 100)
         return effectivity
 

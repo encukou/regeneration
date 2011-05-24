@@ -3,34 +3,51 @@
 
 import weakref
 
-# For an example, we can use veekun's pokedex database.
-from pokedex.db import tables, connect
-
 __copyright__ = 'Copyright 2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
+"""This is an example of how a real Loader class would look like.
+
+Most of the stuff here are dummies, but it should give you an idea of what's
+needed.
+"""
+
+class Dummy(object):
+    def __init__(self, **attrs):
+        for name, value in attrs.items():
+            setattr(self, name, value)
+
 class Loader(object):
     _identifier_cache = weakref.WeakValueDictionary()
 
-    def __init__(self, session):
-        self.session = session
+    def __init__(self):
+        self.battle_stats = [Dummy(identifier=s) for s in
+            'hp attack defense special-attack special-defense speed '
+            'accuracy evasion'.split()]
 
-        self.natures = session.query(tables.Nature).all()
+        self.permanent_stats = self.battle_stats[:6]
 
-        self.battle_stats = session.query(tables.Stat).order_by(
-                tables.Stat.id).all()
-
-        self.permanent_stats = [s for s in self.battle_stats if
-                not s.is_battle_only]
+        self._dummy_type = dummy = Dummy()
+        dummy.damage_efficacies=[Dummy(damage_type=dummy, target_type=dummy,
+                damage_factor=100)]
 
     def load_form(self, identifier, form_identifier=None):
-        query = self.session.query(tables.PokemonForm)
-        query = query.join(tables.PokemonForm.pokemon)
-        query = query.join(tables.Pokemon.species)
-        query = query.filter(tables.PokemonForm.form_identifier == form_identifier)
-        query = query.filter(tables.PokemonSpecies.identifier == identifier)
-        return query.one()
+        dummy = Dummy(
+                form_identifier=form_identifier,
+                monster=Dummy(
+                        items=[],
+                        abilities=[None],
+                        types=[self._dummy_type],
+                    ),
+                species=Dummy(
+                        id=233 if identifier[-1].isdigit() else 137,
+                        gender_rate=0,
+                        base_happiness=0,
+                        identifier=identifier,
+                    ),
+            )
+        return dummy
 
     def load_by_identifier(self, table, identifier):
         key = self.session, table, identifier
@@ -44,31 +61,41 @@ class Loader(object):
             return result
 
     def load_move(self, identifier):
-        return self.load_by_identifier(tables.Move, identifier)
+        return Dummy(
+                target=Dummy(identifier='selected-battler'),
+                priority=0,
+                power=50,
+                type=self._dummy_type,
+                accuracy=100,
+                damage_class=Dummy(identifier='physical'),
+                name='Tackle',
+                identifier=identifier,
+                pp=35,
+            )
 
     def load_nature(self, identifier):
-        return self.load_by_identifier(tables.Nature, identifier)
+        return Dummy(identifier=identifier)
 
     def load_ability(self, identifier):
-        return self.load_by_identifier(tables.Ability, identifier)
+        return Dummy(identifier=identifier)
 
     def load_item(self, identifier):
-        return self.load_by_identifier(tables.Item, identifier)
+        return Dummy(identifier=identifier)
 
     def load_stat(self, identifier):
-        return self.load_by_identifier(tables.Stat, identifier)
+        stat, = [s for s in self.permanent_stats if s.identifier == identifier]
+        return stat
 
     def load_struggle(self):
         return self.load_move('struggle')
 
+    def load_type(self, identifier):
+        return self._dummy_type
+
     def load_types(self, identifiers):
         results = []
-        for name in names:
-            return self.load_type(identifiers)
+        for identifier in identifiers:
+            results.append(self.load_type(identifier))
+        return results
 
-
-loader = Loader(connect())
-
-FormTable = tables.PokemonForm
-FormTable.monster = FormTable.pokemon
-tables.Pokemon.monster_moves = tables.Pokemon.pokemon_moves
+loader = Loader()

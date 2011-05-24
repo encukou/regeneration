@@ -47,7 +47,7 @@ class Stats(dict):
             self[self._stat_by_identifier(attr)] = value
 
     def __str__(self):
-        return "<Stats: {%s}>".format(", ".join("%s: %s" %
+        return "<Stats: {0}>".format(", ".join("%s: %s" %
                 (s.identifier, self[s]) for s in self._stat_objects))
 
     def save(self):

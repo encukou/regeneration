@@ -2,7 +2,6 @@
 # Encoding: UTF-8
 
 import random
-from fractions import Fraction
 
 from regeneration.battle.stats import Stats
 from regeneration.battle.gender import Gender
@@ -46,9 +45,7 @@ class Monster(object):
 
         self.genes = Stats(loader.permanent_stats, 0, 31, rand=rand)
         self.effort = Stats(loader.permanent_stats)
-        self.stats = Stats(loader.permanent_stats)
-
-        self.nature = rand.choice(loader.natures)
+        self.stats = Stats(loader.permanent_stats, 10, 500, rand=rand)
 
         self.hp = 0
         self.recalculate_stats()
@@ -65,7 +62,7 @@ class Monster(object):
         self.shiny = random.randint(0, 65535) < 8
 
         if _load_moves:
-            self.set_moves(self._wild_moves_at_level(level))
+            self.set_moves(self.default_moves(loader))
 
         try:
             self.item = rand.choice(self.kind.items).item
@@ -84,30 +81,7 @@ class Monster(object):
         self.moves[i] = Move(kind)
 
     def recalculate_stats(self):
-        missing_hp = self.stats.hp - self.hp
-        for stat in self.genes:
-            (pstat,) = (
-                    pstat for pstat in self.kind.stats
-                    if pstat.stat.name == stat.name
-                )
-            base = pstat.base_stat
-            gene = self.genes[stat]
-            effort = self.effort[stat]
-            level = self.level
-            result = ((2 * base + gene + (effort // 4)) * level // 100 + 5)
-            if stat.identifier == 'hp':
-                result += level + 5
-            else:
-                nature_modifier = 1
-                if self.nature.increased_stat is pstat.stat:
-                    nature_modifier += Fraction(1, 10)
-                if self.nature.decreased_stat is pstat.stat:
-                    nature_modifier -= Fraction(1, 10)
-                result = int(result * nature_modifier)
-            self.stats[stat] = result
-        self.hp = self.stats.hp - missing_hp
-        if self.hp < 0:
-            self.hp = 0
+        pass
 
     def rename(self, new_name):
         self._name = new_name
@@ -134,28 +108,8 @@ class Monster(object):
     def fainted(self):
         return self.hp <= 0
 
-    def _wild_moves_at_level(self, level):
-        # XXX: This could be sped up if some magic is used so the underlying
-        # query can be accessed => searching in SQL directly. Worth it?
-        movelist = list(x for x
-                in self.kind.monster_moves
-                if x.level <= level and x.method.identifier == 'level-up')
-        movelist.sort(
-                key=lambda x: (
-                        -x.version_group.generation.id,
-                        -x.level,
-                        x.order
-                    )
-            )
-        seen = set()
-        result = []
-        for x in movelist:
-            if x.move not in seen:
-                seen.add(x.move)
-                result.append(x.move)
-                if(len(result) >= 4):
-                    break
-        return result
+    def default_moves(self, loader):
+        return [loader.load_struggle()]
 
     def save(self):
         """Save the monster to a dict"""
@@ -172,6 +126,7 @@ class Monster(object):
                 ability=self.ability.identifier,
                 genes=self.genes.save(),
                 effort=self.effort.save(),
+                stats=self.stats.save(),
                 tameness=self.tameness,
                 hp=self.hp,
                 status=self.status,
@@ -208,6 +163,8 @@ class Monster(object):
         if 'nature' in dct:
             rv.nature = loader.load_nature(get('nature'))
         rv.ability = loader.load_ability(get('ability'))
+        if 'stats' in dct:
+            rv.stats = Stats.load(get('stats'), loader.permanent_stats)
         if 'genes' in dct:
             rv.genes = Stats.load(get('genes'), loader.permanent_stats)
         else:
@@ -229,6 +186,8 @@ class Monster(object):
         rv.recalculate_stats()
         if 'hp' in dct:
             rv.hp = get('hp')
+        else:
+            rv.hp = rv.stats.hp
         return rv
 
 class FakeRand(object):

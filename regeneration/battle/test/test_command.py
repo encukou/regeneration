@@ -3,7 +3,7 @@
 
 from itertools import chain, izip_longest, product
 
-from regeneration.battle.example import connect, tables, loader, FormTable
+from regeneration.battle.example import loader
 from regeneration.battle.test import quiet, FakeRand, QuietTestCase
 
 from regeneration.battle import monster
@@ -43,13 +43,12 @@ class FakeSpot(object):
 class TestCommand(QuietTestCase):
     @classmethod
     def setup_class(cls):
-        cls.session = connect()
-        cls.species = cls.session.query(FormTable).filter_by(id=1).one()
+        cls.species = loader.load_form('f')
 
     def setup_method(self, m):
         super(TestCommand, self).setup_method(m)
-        self.bulba = monster.Monster(self.species, 30, loader, rand=FakeRand())
-        self.battler = battler.Battler(self.bulba, FakeSpot(), loader)
+        self.monster = monster.Monster(self.species, 30, loader, rand=FakeRand())
+        self.battler = battler.Battler(self.monster, FakeSpot(), loader)
         self.battler.spot.battler = self.battler
 
         self.request = command.CommandRequest(self.battler)
@@ -149,7 +148,7 @@ class TestCommand(QuietTestCase):
 
     @quiet
     def test_no_items(self):
-        local_battler = battler.Battler(self.bulba, FakeSpot(), loader)
+        local_battler = battler.Battler(self.monster, FakeSpot(), loader)
         local_request = command.CommandRequest(local_battler)
         del local_battler.spot.trainer.items
 

@@ -3,7 +3,7 @@
 
 import pytest
 
-from regeneration.battle.example import connect, tables, loader
+from regeneration.battle.example import loader
 from regeneration.battle.test import QuietTestCase, FakeRand
 
 from regeneration.battle import trainer

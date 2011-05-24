@@ -3,7 +3,7 @@
 
 from itertools import chain, izip_longest
 
-from regeneration.battle.example import connect, tables, loader
+from regeneration.battle.example import loader
 from regeneration.battle.test import QuietTestCase
 
 from regeneration.battle import effect

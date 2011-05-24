@@ -21,9 +21,6 @@ setup(
     setup_requires=[
             'pytest>=2.0',
         ],
-    tests_require=[
-            "pokedex>=0.1",
-        ],
     packages=find_packages(),
     namespace_packages=['regeneration'],
 

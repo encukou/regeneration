@@ -79,8 +79,6 @@ def test_style(name, filename):
 bad_word_re = re.compile('pok.{1,2}(mon|dex|ball)|p(arameter|kmn)', re.I)
 @for_all_files
 def test_terminology(name, filename):
-    if name in 'example movetargetting testbattle'.split():
-        return
     for lineno, line in enumerate(open(filename), 1):
         if line.strip() == 'CHECK@END':
             return

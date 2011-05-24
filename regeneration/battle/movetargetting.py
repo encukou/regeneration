@@ -69,9 +69,9 @@ class TargetMove(MoveTargetting):
     """Target a specific move."""
     # Should be handled in the move effect
 
-@has_identifier('selected-pokemon')
+@has_identifier('selected-battler')
 class TargetSelectedOpponent(MoveTargetting):
-    """Target a specific opponent."""
+    """Target a specific battler."""
     needs_selected_target = True
 
     @classmethod
@@ -134,7 +134,7 @@ class TargetRandomOpponent(TargetSelectedOpponent):
                         ],
             )]
 
-@has_identifier('all-other-pokemon')
+@has_identifier('all-others')
 class TargetAllOthers(MoveTargetting):
     needsTarget = True
 
@@ -145,7 +145,7 @@ class TargetAllOthers(MoveTargetting):
                 if battler != move_effect.user and not battler.fainted
             ]
 
-@has_identifier('selected-pokemon')
+@has_identifier('all-opponents')
 class TargetAllOpponents(MoveTargetting):
     needsTarget = True
 
@@ -157,7 +157,7 @@ class TargetAllOpponents(MoveTargetting):
                         not battler.fainted
             ]
 
-@has_identifier('all-opponents')
+@has_identifier('entire-field')
 class TargetField(MoveTargetting):
     @classmethod
     def affected_areas(cls, move_effect, targets):
