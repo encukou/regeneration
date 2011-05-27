@@ -455,8 +455,7 @@ class Field(EffectSubject):
         self.init_battler(spot.battler)
 
     def withdraw(self, battler):
-        for effect in self.active_effects:
-            effect.withdraw(battler)
+        Effect.withdraw(battler)
         if not battler.fainted:
             self.message.Withdraw(battler=battler)
         battler.spot.battler = None

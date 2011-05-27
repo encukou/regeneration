@@ -31,13 +31,12 @@ class EffectSubject(object):
         unique_class = effect.unique_class
         if unique_class and self.get_effect(unique_class):
             return None
-        if effect.block_application(effect):
+        if getattr(effect, 'block_application', lambda e:False)(effect):
             return None
         if Effect.block_application(effect):
             return None
         self.effects.append(effect)
-        for e in self.field.active_effects:
-            e.effect_applied(effect)
+        Effect.effect_applied(effect)
         return effect
 
     def give_effect(self, target, effect):
@@ -91,7 +90,10 @@ class EffectSubject(object):
         def generator():
             for effect in self.active_effects:
                 if cls is None or isinstance(effect, cls):
-                    yield getattr(effect, attr)
+                    try:
+                        yield getattr(effect, attr)
+                    except AttributeError:
+                        pass
         def key(callback):
             try:
                 return callback.orderkey
@@ -121,6 +123,10 @@ class callback(object):
     A list containing all true return values is returned.
 
     The first argument must have a field attribute that gives the battlefield.
+
+    Note that the decorated (base class) method itself will only be present on
+    the class (not on instances), and thus will not be called. This means that
+    the body of the decorated function is ignored.
     """
     def __init__(self, func, orderkey=None):
         self.func = func
@@ -128,12 +134,7 @@ class callback(object):
 
     def __get__(self, instance, owner):
         if instance:
-            pa = partial(self.func, instance)
-            try:
-                pa.orderkey = self.func.orderkey
-            except:
-                pa.orderkey = None
-            return pa
+            raise AttributeError(self.name)
         else:
             return wraps(self.func)(partial(self.run_all, owner))
 
@@ -152,6 +153,10 @@ class chain(callback):
 
     "Chain" means that the return value of one method is passed as the second
     argument to the next, and the last one is returned.
+
+    Note that the decorated (base class) method itself will only be present on
+    the class (not on instances), and thus will not be called. This means that
+    the body of the decorated function is ignored.
     """
 
     def run_all(self, owner, object, value, *args, **kwargs):
@@ -230,51 +235,36 @@ class Effect(object):
 
     @callback
     def effect_removed(self, effect):
-        """Called when an effect is removed.
-        """
-        return
+        """Called when an effect is removed."""
 
     @callback
     def effect_applied(self, effect):
-        """Called when some effect has been applied.
-        """
-        return
+        """Called when some effect has been applied."""
 
     @callback
     def move_hit(self, hit):
-        """Called when a move connected with a target.
-        """
-        return
+        """Called when a move connected with a target."""
 
     @callback
     def move_damage_done(self, hit):
-        """Called when a move damages a target.
-        """
-        return
+        """Called when a move damages a target."""
 
     @callback
     def damage_done(self, subject, damage):
-        """Called when damage is done to battler
-        """
-        return
+        """Called when damage is done to battler"""
 
     @callback
     def begin_turn(self, turn_number):
-        """Called when a turn begins
-        """
-        return
+        """Called when a turn begins"""
 
     @callback
     def send_out(self, battler):
-        """Called when battler is sent to battle
-        """
-        return
+        """Called when battler is sent to battle"""
 
     @callback
     def withdraw(self, battler):
         """Called when battler is withdrawn from battle (incl. after fainting)
         """
-        return
 
     # Cancellers
 
@@ -305,13 +295,11 @@ class Effect(object):
     def prevent_hit(self, hit):
         """Return true to prevent a move's hit
         """
-        return False
 
     @callback
     def prevent_switch(self, command):
         """Return true to prevent a switch
         """
-        return False
 
     # Chainers
 

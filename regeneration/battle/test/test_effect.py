@@ -12,44 +12,48 @@ __copyright__ = 'Copyright 2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
-class BlockingEffect(effect.Effect):
+class BaseTestEffect(effect.Effect):
     @effect.callback
+    def append(self, subject, item):
+        pass
+
+    @effect.chain
+    def count(self, subject, value):
+        pass
+
+class BlockingEffect(BaseTestEffect):
     def block_application(self, effect):
         if effect is not self:
             return True
 
-class UnapplicableEffect(effect.Effect):
-    @effect.callback
+class UnapplicableEffect(BaseTestEffect):
     def block_application(self, effect):
         return True
 
-class RecordingEffect(effect.Effect):
+class RecordingEffect(BaseTestEffect):
     def __init__(self, results=None):
         if results is None:
             results = set()
         self.results = results
 
-    @effect.callback
     def append(self, subject, item):
         self.results.add((item, self))
 
-class OtherRecordingEffect(effect.Effect):
+class OtherRecordingEffect(BaseTestEffect):
     def __init__(self, results = None):
         if results is None:
             results = set()
         self.results = results
 
-    @effect.callback
     def append(self, subject, item):
         self.results.add((item, self))
 
-class CountingEffect(effect.Effect):
-    @effect.chain
+class CountingEffect(BaseTestEffect):
     def count(self, subject, value):
         return value + 1
 
 @effect.unique_effect
-class UniqueEffect(effect.Effect):
+class UniqueEffect(BaseTestEffect):
     pass
 
 class TestEffect(QuietTestCase):
@@ -182,15 +186,6 @@ class TestEffect(QuietTestCase):
         assert list(self.subject_a.get_effects()) == []
         assert list(self.subject_b.get_effects()) == [eff]
 
-    def test_good_call(self):
-        results = set()
-        eff_a = self.subject_a.give_effect_self(RecordingEffect(results))
-        eff_b = self.subject_a.give_effect_self(OtherRecordingEffect(results))
-        RecordingEffect.append(self.subject_b, 'abc')
-        assert results == set([('abc', eff_a)])
-        OtherRecordingEffect.append(self.subject_b, 'def')
-        assert results == set([('abc', eff_a), ('def', eff_b)])
-
     def test_str(self):
         assert 'RecordingEffect' in str(RecordingEffect())
 
@@ -204,8 +199,8 @@ class TestEffect(QuietTestCase):
         assert set(self.fake_field.active_effects) == set([uniq])
 
     def test_chaining(self):
-        assert CountingEffect.count(self.subject_a, 0) == 0
+        assert BaseTestEffect.count(self.subject_a, 0) == 0
         self.subject_b.give_effect_self(CountingEffect())
-        assert CountingEffect.count(self.subject_a, 0) == 1
+        assert BaseTestEffect.count(self.subject_a, 0) == 1
         self.subject_b.give_effect_self(CountingEffect())
-        assert CountingEffect.count(self.subject_a, 0) == 2
+        assert BaseTestEffect.count(self.subject_a, 0) == 2

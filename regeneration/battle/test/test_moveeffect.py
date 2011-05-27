@@ -103,12 +103,16 @@ class TestMoveEffect(QuietTestCase):
         self.user.fainted = False
         self.user.types = []
         self.user.hp = 30
+        self.user.spot = Object()
+        self.user.spot.battler = self.user
 
         self.target = Object()
         self.target.field = self.field
         self.target.fainted = False
         self.target.types = []
         self.target.hp = 40
+        self.target.spot = Object()
+        self.target.spot.battler = self.target
 
         self.moveeffect = moveeffect.MoveEffect(
                 move=self.move,
