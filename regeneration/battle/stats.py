@@ -7,7 +7,22 @@ __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
-class Stats(dict):
+class StatAttributeAccessMixin(object):
+    def _stat_by_identifier(self, identifier):
+        identifier = identifier.replace('_', '-')
+        return [s for s in self if s.identifier == identifier][0]
+
+    def __getattr__(self, attr):
+        return self[self._stat_by_identifier(attr)]
+
+    def __setattr__(self, attr, value):
+        if attr[0] == '_':
+            super(StatAttributeAccessMixin, self).__setattr__(attr, value)
+        else:
+            self[self._stat_by_identifier(attr)] = value
+
+
+class Stats(dict, StatAttributeAccessMixin):
     """A collection of stat values
 
     Besides the special __init__, it also allows attribute access to the stats,
@@ -23,7 +38,6 @@ class Stats(dict):
             (as given by rand)
         Otherwise, they will all get set to min, or 0 by default.
         """
-        self._stat_objects = stat_objects
         try:
             dict.__init__(self, stat_objects)
         except TypeError:
@@ -33,22 +47,9 @@ class Stats(dict):
                 else:
                     self[stat] = rand.randint(min, max)
 
-    def _stat_by_identifier(self, identifier):
-        identifier = identifier.replace('_', '-')
-        return [s for s in self._stat_objects if s.identifier == identifier][0]
-
-    def __getattr__(self, attr):
-        return self[self._stat_by_identifier(attr)]
-
-    def __setattr__(self, attr, value):
-        if attr[0] == '_':
-            super(Stats, self).__setattr__(attr, value)
-        else:
-            self[self._stat_by_identifier(attr)] = value
-
     def __str__(self):
         return "<Stats: {0}>".format(", ".join("%s: %s" %
-                (s.identifier, self[s]) for s in self._stat_objects))
+                (k.identifier, v) for k, v in self.items()))
 
     def save(self):
         return dict((k.identifier, v) for k, v in self.items())

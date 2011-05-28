@@ -203,7 +203,7 @@ class Field(EffectSubject):
         self.command_loop()
 
     def sort_by_speed(self, lst,
-            key=lambda x: x.monster.stats.spd,
+            key=lambda x: x.stats.speed,
             reverse=False,
             shuffle=False,
         ):
@@ -397,8 +397,7 @@ class Field(EffectSubject):
         return commands
 
     def command_sort_order(self, command):
-        speed_stat = self.loader.load_stat('speed')
-        speed_value = command.request.battler.stats[speed_stat]
+        speed_value = command.request.battler.stats.speed
         trick_factor = Effect.speed_factor(self, 1)
         speed_sort_value = -speed_value * trick_factor
         if command.command == 'move':

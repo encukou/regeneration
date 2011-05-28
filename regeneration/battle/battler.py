@@ -6,13 +6,23 @@ from collections import namedtuple
 from functools import partial
 
 from regeneration.battle.effect import Effect, EffectSubject
-from regeneration.battle.stats import Stats
+from regeneration.battle.stats import Stats, StatAttributeAccessMixin
 from regeneration.battle.move import Move
 from regeneration.battle import messages
 
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
+
+class ComputedStats(StatAttributeAccessMixin):
+    def __init__(self, battler):
+        self._battler = battler
+
+    def __getitem__(self, stat):
+        return self._battler.get_stat(stat)
+
+    def __iter__(self):
+        return iter(self._battler.stat_levels)
 
 class Battler(EffectSubject):
     """A currently-sent-out monster.
@@ -31,7 +41,7 @@ class Battler(EffectSubject):
         self.ability_effect = None
         self.ability = monster.ability
 
-        self.stats = Stats(monster.stats)
+        self.stats = ComputedStats(self)
         self.stat_levels = Stats(loader.battle_stats)
 
         self.moves = list(monster.moves)
@@ -125,6 +135,38 @@ class Battler(EffectSubject):
 
     def get_item_effect(self):
         return None
+
+    def get_stat(self, stat):
+        level = self.stat_levels[stat]
+        if stat in self.monster.stats:
+            base = self.monster.stats[stat]
+            numerator = denominator = 2
+            round_func = int
+        else:
+            base = 1
+            numerator = denominator = 3
+            round_func = Fraction
+        if level < 0:
+            denominator -= level
+        elif level > 0:
+            numerator += level
+        value = round_func(base * Fraction(numerator, denominator))
+        return Effect.modify_stat(self, value, stat)
+
+    def raise_stat(self, stat, delta, verbose=True):
+        previous = self.stat_levels[stat]
+        result = self.stat_levels[stat] + delta
+        if result > 6:
+            result = 6
+        elif result < -6:
+            result = -6
+        self.stat_levels[stat] = result
+        real_delta = result - previous
+        if verbose:
+            direction = (delta > 0) - (delta < 0)
+            self.field.message.StatChange(battler=self, stat=stat,
+                    delta=real_delta, direction=direction)
+        return real_delta
 
     def message_values(self, trainer):
         hp_fraction = Fraction(self.hp, self.stats.hp).limit_denominator(48)

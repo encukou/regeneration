@@ -17,6 +17,7 @@ setup(
     author_email=__email__,
     install_requires=[
             "pyyaml>=3.0",
+            "multimethod>=0.2",
         ],
     setup_requires=[
             'pytest>=2.0',

@@ -332,3 +332,9 @@ class Effect(object):
         """Modify the critical hit stage
         """
         return stage
+
+    @chain
+    def modify_stat(self, battler, value, stat):
+        """Modify a stat
+        """
+        return value

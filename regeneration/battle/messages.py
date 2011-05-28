@@ -8,6 +8,15 @@ __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
 __email__ = 'encukou@gmail.com'
 
+@multimethod(object, object)
+def message_values(obj, trainer):
+    return obj.message_values(trainer)
+
+for type_ in (int, unicode, bool):
+    @multimethod(type_, object)
+    def message_values(scalar, trainer):
+        return scalar
+
 class MessageArgument(object):
     pass
 
@@ -52,10 +61,7 @@ class Message(Mapping):
             contents = dict()
             for name, arg_type in self.argument_types.items():
                 value = self.arguments[name]
-                if isinstance(value, (int, bool, unicode)):
-                    contents[name] = value
-                else:
-                    contents[name] = value.message_values(trainer)
+                contents[name] = message_values(value, trainer)
             contents['class'] = self._classname
             self._contents[trainer] = contents
             return contents
@@ -203,6 +209,30 @@ class Miss(Message):
 class CriticalHit(Message):
     message = "A critical hit!"
     hit = MessageArgument()
+
+
+class StatChange(Message):
+    battler = MessageArgument()
+    stat = MessageArgument()
+    delta = MessageArgument()
+    direction = MessageArgument()
+
+    def __init__(self, field, **kwargs):
+        super(StatChange, self).__init__(field, **kwargs)
+        delta = kwargs['delta']
+        direction = kwargs['direction']
+        if delta <= -2:
+            self.message = "{battler}'s {stat} harshly fell!"
+        elif delta == -1:
+            self.message = "{battler}'s {stat} fell!"
+        elif delta == 0 and direction < 0:
+            self.message = "{battler}'s {stat} won't go lower!"
+        elif delta == 0 and direction > 0:
+            self.message = "{battler}'s {stat} won't go higher!"
+        elif delta == 1:
+            self.message = "{battler}'s {stat} rose!"
+        elif delta >= 2:
+            self.message = "{battler}'s {stat} sharply rose!"
 
 
 class GainAbility(Message):
