@@ -28,10 +28,7 @@ class EffectSubject(object):
         effect.field = self.field
         effect.inducer = inducer
         effect.active = True
-        unique_class = effect.unique_class
-        if unique_class and self.get_effect(unique_class):
-            return None
-        if getattr(effect, 'block_application', lambda e:False)(effect):
+        if getattr(effect, 'block_application', lambda e: False)(effect):
             return None
         if Effect.block_application(effect):
             return None
@@ -100,14 +97,6 @@ class EffectSubject(object):
             except AttributeError:
                 return None
         return sorted(generator(), key=key)
-
-def unique_effect(cls):
-    """Decorator for unique effects; only one instance of such a class
-    is allowed on a single subject. These may be singletons (e.g. infatuation),
-    or exclusive classes (like the fixed status effects).
-    """
-    cls.unique_class = cls
-    return cls
 
 def return_list(func):
     @wraps(func)

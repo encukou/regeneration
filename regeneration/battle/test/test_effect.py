@@ -52,10 +52,6 @@ class CountingEffect(BaseTestEffect):
     def count(self, subject, value):
         return value + 1
 
-@effect.unique_effect
-class UniqueEffect(BaseTestEffect):
-    pass
-
 class TestEffect(QuietTestCase):
     def setup_method(self, m):
         super(TestEffect, self).setup_method(m)
@@ -191,12 +187,6 @@ class TestEffect(QuietTestCase):
 
     def test_repr(self):
         assert 'RecordingEffect' in repr(RecordingEffect())
-
-    def test_unique_effect(self):
-        uniq = self.fake_field.give_effect_self(UniqueEffect())
-        assert set(self.fake_field.active_effects) == set([uniq])
-        assert self.fake_field.give_effect_self(UniqueEffect()) == None
-        assert set(self.fake_field.active_effects) == set([uniq])
 
     def test_chaining(self):
         assert BaseTestEffect.count(self.subject_a, 0) == 0
