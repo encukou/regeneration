@@ -129,6 +129,7 @@ class Battler(EffectSubject):
                 delta=-damage, hp=self.hp)
         if self.hp <= 0:
             self.field.message.Fainted(battler=self)
+            self.status = 'fnt'
 
     def get_ability_effect(self):
         return None
