@@ -286,8 +286,7 @@ class Field(EffectSubject):
         for command in commands:
             battler = command.battler
             spot = battler.spot
-            self.withdraw(battler)
-            self.release_monster(spot, command.replacement)
+            self.switch(spot, command.replacement)
         for command in commands:
             self.init_battler(command.battler)
 
@@ -464,11 +463,9 @@ class Field(EffectSubject):
         assert spot.battler is None
         spot.battler = battler = self.BattlerClass(monster, spot, self.loader)
         self.message.SendOut(battler=battler)
-        Effect.send_out(battler)
 
     def init_battler(self, battler):
-        for effect in battler.active_effects:
-            effect.switchIn()
+        Effect.send_out(battler)
 
     def check_win(self):
         # Losing is defined as "having nothing on the field AND nothing
