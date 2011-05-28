@@ -195,7 +195,7 @@ class Field(EffectSubject):
                 reverse=True,
             )
         for spot, mon in sendouts:
-            self.init_battler(spot.battler)
+            Effect.send_out(spot.battler)
 
         self.state = 'waiting'
 
@@ -278,17 +278,17 @@ class Field(EffectSubject):
         """Send out monsters to replace those that have fainted."""
         self.assert_state('waiting_replacements')
 
-        commands = [
-                command for command in self.commands.values()
-                if command.command == 'switch'
-            ]
+        commands = [command for command in self.commands.values()
+                if command.command == 'switch']
 
         for command in commands:
             battler = command.battler
             spot = battler.spot
             self.switch(spot, command.replacement)
+
+        commands.sort(key=lambda c: -c.replacement.stats.speed)
         for command in commands:
-            self.init_battler(command.battler)
+            Effect.send_out(command.battler.spot.battler)
 
         self.ask_for_commands()
 
@@ -376,6 +376,7 @@ class Field(EffectSubject):
                     command.move_effect.attempt_use()
             elif command.command == 'switch':
                 self.switch(command.request.spot, command.replacement)
+                Effect.send_out(command.battler.spot.battler)
             else:
                 raise NotImplementedError(command)
             self.message.SubturnEnd(battler=battler, turn=self.turn_number)
@@ -453,7 +454,6 @@ class Field(EffectSubject):
     def switch(self, spot, replacement):
         self.withdraw(spot.battler)
         self.release_monster(spot, replacement)
-        self.init_battler(spot.battler)
 
     def withdraw(self, battler):
         Effect.withdraw(battler)
@@ -465,9 +465,6 @@ class Field(EffectSubject):
         assert spot.battler is None
         spot.battler = battler = self.BattlerClass(monster, spot, self.loader)
         self.message.SendOut(battler=battler)
-
-    def init_battler(self, battler):
-        Effect.send_out(battler)
 
     def check_win(self):
         # Losing is defined as "having nothing on the field AND nothing
