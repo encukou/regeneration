@@ -3,6 +3,7 @@
 
 from contextlib import contextmanager
 from functools import wraps, partial
+import collections
 
 __copyright__ = 'Copyright 2009-2011, Petr Viktorin'
 __license__ = 'MIT'
@@ -81,22 +82,30 @@ class EffectSubject(object):
             for effect in subsubject.active_effects:
                 yield effect
 
-    def get_effect_methods(self, cls, attr):
+    def get_effect_methods(self, cls, attr, object):
         """Yields an attribute for all active effects of a given class.
         """
         def generator():
             for effect in self.active_effects:
                 if cls is None or isinstance(effect, cls):
                     try:
-                        yield getattr(effect, attr)
+                        callback = getattr(effect, attr)
                     except AttributeError:
                         pass
-        def key(callback):
-            try:
-                return callback.orderkey
-            except AttributeError:
-                return None
-        return sorted(generator(), key=key)
+                    else:
+                        try:
+                            orderkey = callback.orderkey
+                        except AttributeError:
+                            yield None, callback
+                        else:
+                            if callable(orderkey):
+                                orderkey = orderkey(effect)
+                                if isinstance(orderkey, collections.Iterator):
+                                    for key in orderkey:
+                                        yield key, callback
+                                    continue
+                            yield orderkey, callback
+        return [v for k, v in sorted(generator())]
 
 def return_list(func):
     @wraps(func)
@@ -128,7 +137,7 @@ class callback(object):
             return wraps(self.func)(partial(self.run_all, owner))
 
     def get_effect_methods(self, owner, object):
-        return object.field.get_effect_methods(owner, self.name)
+        return object.field.get_effect_methods(owner, self.name, object)
 
     @return_list
     def run_all(self, owner, object, *args, **kwargs):
@@ -181,6 +190,11 @@ class Effect(object):
     @staticmethod
     def orderkey(key):
         """Decorator to attach an order key to a callback
+
+        A key may also be callable, in which case it's called with the
+        effect as an argument.
+        The callable may be a generator, in which case the callback will
+        be called multiple times: once for each value.
         """
         def _attach_orderkey(func):
             func.orderkey = key
