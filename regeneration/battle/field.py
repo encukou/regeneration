@@ -23,9 +23,9 @@ class MessageSender(object):
         self.messages = messages
 
     def __getattr__(self, attr):
-        return partial(self.send, getattr(self.messages, attr))
+        return partial(self, getattr(self.messages, attr))
 
-    def send(self, cls, **kwargs):
+    def __call__(self, cls, **kwargs):
         self.field.send_message(cls(field=self.field, **kwargs))
 
 class Side(EffectSubject):

@@ -103,8 +103,10 @@ class OrderKey(object):
             self.next = _parent.next
             self.id = 0
 
-    def new_before(self):
+    def new_before(self, number=None):
         """Create a new key that comes before this one and return it"""
+        if number is not None:
+            return list(reversed([self.new_before() for i in range(number)]))
         rv = OrderKey(self)
         rv.next = self
         prev = self.prev
@@ -117,8 +119,10 @@ class OrderKey(object):
             rv.id = self.id - 1
         return rv
 
-    def new_after(self):
+    def new_after(self, number=None):
         """Create a new key that comes after this one and return it"""
+        if number is not None:
+            return [self.new_after() for i in range(number)]
         rv = OrderKey(self)
         rv.prev = self
         next = self.next

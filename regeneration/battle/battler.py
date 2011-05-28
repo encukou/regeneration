@@ -179,7 +179,7 @@ class Battler(EffectSubject):
                 name=self.name,
                 hp_fraction=[hp_fraction.numerator, hp_fraction.denominator],
                 hp=hp,
-                spot=self.spot.message_values(trainer)
+                spot=self.spot.message_values(trainer),
             )
 
     def __repr__(self):
