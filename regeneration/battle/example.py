@@ -71,6 +71,7 @@ class Loader(object):
                 name='Tackle',
                 identifier=identifier,
                 pp=35,
+                effect_chance=0,
             )
 
     def load_nature(self, identifier):

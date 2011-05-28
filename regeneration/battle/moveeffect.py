@@ -60,6 +60,7 @@ class MoveEffect(object):
         self.accuracy = move.accuracy
         self.damage_class = move.damage_class
         self.targetting = move.targetting
+        self.secondary_effect_chance = move.secondary_effect_chance
 
         if move.pp is None:
             self.flags = self.flags.union([self.ppless])
@@ -126,6 +127,8 @@ class MoveEffect(object):
     def hit(self, hit):
         if self.power:
             self.do_damage(hit)
+        if self.secondary_effect_chance:
+            self.attempt_secondary_effect(hit)
         return hit
 
     def do_damage(self, hit):
@@ -136,6 +139,14 @@ class MoveEffect(object):
     def calculate_damage(self, hit):
         # This is too mechanic-specific to have in MoveEffect
         return self.field.calculate_damage(hit)
+
+    def attempt_secondary_effect(self, hit):
+        if self.field.flip_coin(self.secondary_effect_chance,
+                'Attempt secondary effect'):
+            self.do_secondary_effect(hit)
+
+    def do_secondary_effect(self, hit):
+        pass
 
     def deduct_pp(self):
         if self.ppless not in self.flags:

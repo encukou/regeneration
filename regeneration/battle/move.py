@@ -36,6 +36,11 @@ class Move(object):
 
         self.targetting = self.get_targetting(kind.target.identifier)
 
+        if kind.effect_chance:
+            self.secondary_effect_chance = Fraction(kind.effect_chance, 100)
+        else:
+            self.secondary_effect_chance = None
+
         # We like convenient-er accessors to common things
         self.flags = MoveFlags(kind)
 

@@ -97,6 +97,7 @@ class TestMoveEffect(QuietTestCase):
         self.move.targetting = Object()
         self.move.targetting.targets = lambda u, t: [t]
         self.move.pp = 5
+        self.move.secondary_effect_chance = 0
 
         self.user = Object()
         self.user.field = self.field
