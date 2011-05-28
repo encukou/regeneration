@@ -143,6 +143,8 @@ class chain(callback):
     "Chain" means that the return value of one method is passed as the second
     argument to the next, and the last one is returned.
 
+    Raise StopIteration to end the chain.
+
     Note that the decorated (base class) method itself will only be present on
     the class (not on instances), and thus will not be called. This means that
     the body of the decorated function is ignored.
@@ -253,6 +255,11 @@ class Effect(object):
     @callback
     def withdraw(self, battler):
         """Called when battler is withdrawn from battle (incl. after fainting)
+        """
+
+    @callback
+    def end_turn(self, field):
+        """Called when a turn ends.
         """
 
     # Cancellers

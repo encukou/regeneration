@@ -382,7 +382,10 @@ class Field(EffectSubject):
             if self.check_win():
                 return
 
-        self.end_turn_effects()
+        Effect.end_turn(self)
+
+        if self.check_win():
+            return
 
         self.message.TurnEnd(turn=self.turn_number)
 
@@ -499,9 +502,6 @@ class Field(EffectSubject):
             self.message.Victory(side=side)
         else:
             self.message.Draw()
-
-    def end_turn_effects(self):
-        pass
 
     # Random stuff (literally)
 
