@@ -177,6 +177,8 @@ class MoveEffect(object):
                 5: Fraction(1, 2),
             }[min(stage, 5)]
         hit.is_critical = self.field.flip_coin(rate, 'Determine critical hit')
+        if not hit.is_critical:
+            hit.is_critical = Effect.force_critical_hit(self)
 
     def message_values(self, trainer):
         if trainer == self.user.trainer and self.target:

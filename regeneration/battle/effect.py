@@ -276,7 +276,7 @@ class Effect(object):
         """Called when a turn ends.
         """
 
-    # Cancellers
+    # Cancellers/forcers
 
     @callback
     def block_application(self, effect):
@@ -308,6 +308,11 @@ class Effect(object):
 
     @callback
     def prevent_switch(self, command):
+        """Return true to prevent a switch
+        """
+
+    @callback
+    def force_critical_hit(self, hit):
         """Return true to prevent a switch
         """
 
