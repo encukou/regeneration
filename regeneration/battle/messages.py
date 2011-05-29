@@ -12,7 +12,7 @@ __email__ = 'encukou@gmail.com'
 def message_values(obj, trainer):
     return obj.message_values(trainer)
 
-for type_ in (int, unicode, bool):
+for type_ in (int, unicode, bool, type(None)):
     @multimethod(type_, object)
     def message_values(scalar, trainer):
         return scalar
