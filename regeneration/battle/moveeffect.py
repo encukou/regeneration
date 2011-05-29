@@ -191,12 +191,12 @@ class Hit(object):
         self.target = target
         self.field = move_effect.field
         self.user = move_effect.user
-        self.power = move_effect.power
         self.type = move_effect.type
         self.accuracy = move_effect.accuracy
         self.damage_class = move_effect.damage_class
         self.args = kwargs
         self.effectivity = self._get_effectivity()
+        self.power = Effect.modify_base_power(self, move_effect.power)
 
     def _get_effectivity(self):
         if not self.type:

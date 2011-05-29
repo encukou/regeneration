@@ -348,3 +348,9 @@ class Effect(object):
         """Modify a stat
         """
         return value
+
+    @chain
+    def modify_base_power(self, hit, power):
+        """Modify the base power of a move
+        """
+        return power
