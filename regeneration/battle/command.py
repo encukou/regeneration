@@ -120,7 +120,7 @@ class CommandRequest(object):
         if have_some_moves:
             return
         # Struggle
-        struggle = Move(self.field.struggle)
+        struggle = self.battler.monster.MoveClass(self.field.struggle)
         yield MoveCommand(self, move=struggle)
 
     @filter_allowed
