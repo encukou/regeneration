@@ -88,26 +88,31 @@ class MoveEffect(object):
 
     def do_use(self, **kwargs):
         self.field.message.UseMove(battler=self.user, moveeffect=self)
+        self.targets = list(self.get_targets(**kwargs))
         self.deduct_pp()
-        return self.use(**kwargs)
+        hits = self.use(**kwargs)
+        return hits
 
     def use(self, **kwargs):
-        hits = [hit for hit in self.hits(**kwargs)]
+        self.targets = list(self.get_targets(**kwargs))
+        hits = list(self.hits(**kwargs))
         if not hits:
             self.field.message.NoTarget(moveeffect=self)
         else:
             return [self.attempt_hit(hit) for hit in hits]
 
     def hits(self, **kwargs):
-        for target in self.targets(**kwargs):
-            if self.targettable(target, **kwargs):
-                yield Hit(self, target, **kwargs)
+        for target in self.targets:
+            yield Hit(self, target, **kwargs)
 
-    def targets(self, **kwargs):
+    def get_targets(self, **kwargs):
         if self.target:
-            return self.targetting.targets(self, self.target.spot.battler)
+            target = self.target.spot.battler
         else:
-            return self.targetting.targets(self, None)
+            target = None
+        for target in self.targetting.targets(self, target):
+            if self.targettable(target, **kwargs):
+                yield target
 
     def targettable(self, target, **kwargs):
         return not target.fainted
@@ -133,14 +138,15 @@ class MoveEffect(object):
     def hit(self, hit):
         if self.power:
             self.do_damage(hit)
-        if self.secondary_effect_chance:
+        if hit.damage and self.secondary_effect_chance:
             self.attempt_secondary_effect(hit)
         return hit
 
     def do_damage(self, hit):
         hit.damage = self.calculate_damage(hit)
-        hit.target.do_damage(hit.damage, direct=True)
-        Effect.move_damage_done(hit.target, hit.damage)
+        if hit.damage:
+            hit.target.do_damage(hit.damage, direct=True)
+            Effect.move_damage_done(hit.target, hit.damage)
 
     def calculate_damage(self, hit):
         # This is too mechanic-specific to have in MoveEffect

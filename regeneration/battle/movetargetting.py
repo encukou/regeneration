@@ -113,7 +113,7 @@ class TargetOpponentSide(MoveTargetting):
 class TargetUser(MoveTargetting):
     @classmethod
     def targets(cls, move_effect, chosen_target):
-        return [move_effect.user]
+        return []
 
 @has_identifier('random-opponent')
 class TargetRandomOpponent(MoveTargetting):
