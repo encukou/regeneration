@@ -138,6 +138,8 @@ class Battler(EffectSubject):
         return None
 
     def get_stat(self, stat):
+        if stat.identifier == 'hp':
+            return self.monster.stats[stat]
         level = self.stat_levels[stat]
         if stat in self.monster.stats:
             base = self.monster.stats[stat]
