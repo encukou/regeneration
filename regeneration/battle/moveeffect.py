@@ -125,10 +125,10 @@ class MoveEffect(object):
         return self.do_hit(hit)
 
     def roll_accuracy(self, hit):
-        accuracy = Effect.modify_accuracy(hit, hit.accuracy)
-        if accuracy is None:
+        if hit.accuracy is None:
             return True
         else:
+            accuracy = Effect.modify_accuracy(hit, hit.accuracy)
             return self.field.flip_coin(accuracy, 'Determine hit')
 
     def do_hit(self, hit):
