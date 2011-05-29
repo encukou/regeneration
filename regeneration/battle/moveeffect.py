@@ -137,8 +137,9 @@ class MoveEffect(object):
 
     def hit(self, hit):
         if self.power:
-            self.do_damage(hit)
-        if hit.damage and self.secondary_effect_chance:
+            if not self.do_damage(hit):
+                return None
+        if self.secondary_effect_chance:
             self.attempt_secondary_effect(hit)
         return hit
 
@@ -147,6 +148,7 @@ class MoveEffect(object):
         if hit.damage:
             hit.target.do_damage(hit.damage, direct=True)
             Effect.move_damage_done(hit.target, hit.damage)
+        return hit.damage
 
     def calculate_damage(self, hit):
         # This is too mechanic-specific to have in MoveEffect
