@@ -29,7 +29,7 @@ class Loader(object):
         self.permanent_stats = self.battle_stats[:6]
 
         self._dummy_type = dummy = Dummy()
-        dummy.damage_efficacies=[Dummy(damage_type=dummy, target_type=dummy,
+        dummy.damage_efficacies = [Dummy(damage_type=dummy, target_type=dummy,
                 damage_factor=100)]
 
     def load_form(self, identifier, form_identifier=None):

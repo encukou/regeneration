@@ -124,7 +124,8 @@ class Field(EffectSubject):
 
     def debug(self, turn_no=None):
         if turn_no is None or turn_no == self.turn_number:
-            import pdb; pdb.set_trace()
+            import pdb
+            pdb.set_trace()
 
     # Loaders
 

@@ -21,7 +21,7 @@ class Trainer(object):
         self.rand = rand
 
     def request_command(self, request):
-        """Process CommandRequest: either return a Command or select() one later
+        """Process CommandRequest: must return a Command or select() one later
 
         The base class implementation is geared towards simple AI trainers,
         which should implement get_commands.

@@ -23,7 +23,7 @@ class Monster(object):
     The most important species attributes (e.g. types) are available directly
     on Monster, but most are accessible only through the species.
 
-    If genes, effort, or nature are changed, be sure to call recalculateStats().
+    If genes, effort, or nature are changed, be sure to call recalculateStats()
     """
     MoveClass = Move
 
@@ -151,7 +151,7 @@ class Monster(object):
                 loader.load_form(get('species'), get('form', None)),
                 get('level', 100),
                 loader,
-                rand = FakeRand(),
+                rand=FakeRand(),
                 _load_moves='moves' not in dct,
             )
         rv.name = get('nickname', None)

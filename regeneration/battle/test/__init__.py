@@ -47,7 +47,8 @@ def quiet_context():
     yield
     sys.stdout = orig_stdout
     if logger.stack:
-        print; print '-----'
+        print
+        print '-----'
         for line in logger.stack:
             print line.rstrip()
         print 'Test wrote to stdout'

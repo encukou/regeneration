@@ -94,8 +94,8 @@ class TestTrainer(QuietTestCase):
                 self.mon2
             )
         assert (
-                None ==
-                self.trainer.get_random_inactive_monster([self.mon1, self.mon2])
+                None == self.trainer.get_random_inactive_monster([self.mon1,
+                        self.mon2])
             )
 
     def test_exclusion_random(self):

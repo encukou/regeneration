@@ -40,7 +40,7 @@ class RecordingEffect(BaseTestEffect):
         self.results.add((item, self))
 
 class OtherRecordingEffect(BaseTestEffect):
-    def __init__(self, results = None):
+    def __init__(self, results=None):
         if results is None:
             results = set()
         self.results = results
