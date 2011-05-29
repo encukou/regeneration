@@ -74,7 +74,7 @@ class MoveEffect(object):
 
     def fail(self, hit=None):
         """Signals failure"""
-        return
+        self.field.message.Failed(moveeffect=self)
 
     def miss(self, hit):
         """Move missed"""
@@ -83,7 +83,7 @@ class MoveEffect(object):
 
     def attempt_use(self, **kwargs):
         if Effect.prevent_use(self):
-            return self.fail()
+            return
         return self.do_use()
 
     def do_use(self, **kwargs):

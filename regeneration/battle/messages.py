@@ -206,6 +206,10 @@ class Miss(Message):
     message = "{hit.user}'s attack missed."
     hit = MessageArgument()
 
+class Failed(Message):
+    message = "But, it failed."
+    moveeffect = MessageArgument()
+
 class CriticalHit(Message):
     message = "A critical hit!"
     hit = MessageArgument()
