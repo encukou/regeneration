@@ -92,8 +92,11 @@ class MoveEffect(object):
         return self.use(**kwargs)
 
     def use(self, **kwargs):
-        self.hits = [hit for hit in self.hits(**kwargs)]
-        return [self.attempt_hit(hit) for hit in self.hits]
+        hits = [hit for hit in self.hits(**kwargs)]
+        if not hits:
+            self.field.message.NoTarget(moveeffect=self)
+        else:
+            return [self.attempt_hit(hit) for hit in hits]
 
     def hits(self, **kwargs):
         for target in self.targets(**kwargs):
@@ -101,7 +104,10 @@ class MoveEffect(object):
                 yield Hit(self, target, **kwargs)
 
     def targets(self, **kwargs):
-        return self.targetting.targets(self, self.target.spot.battler)
+        if self.target:
+            return self.targetting.targets(self, self.target.spot.battler)
+        else:
+            return self.targetting.targets(self, None)
 
     def targettable(self, target, **kwargs):
         return not target.fainted

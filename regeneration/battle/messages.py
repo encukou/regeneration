@@ -239,3 +239,7 @@ class GainAbility(Message):
     battler = MessageArgument()
     ability = MessageArgument()
 
+class NoTarget(Message):
+    message = "But, there was no opponent!"
+    moveeffect = MessageArgument()
+
