@@ -38,9 +38,6 @@ class Battler(EffectSubject):
         self.species = monster.species
         self.spot = spot
 
-        self.ability_effect = None
-        self.ability = monster.ability
-
         self.stats = ComputedStats(self)
         self.stat_levels = Stats(loader.battle_stats)
 
@@ -51,8 +48,11 @@ class Battler(EffectSubject):
 
         self.trainer = spot.trainer
 
+        self.ability_effect = None
+        self.ability = monster.ability
+
         self.item_effect = None
-        self.item = self.item
+        self.item = monster.item
 
     @property
     def fainted(self):
