@@ -122,11 +122,18 @@ class Battler(EffectSubject):
         self.moves = list(self.moves)
         self.moves[i] = Move(kind)
 
-    def do_damage(self, damage, direct=False, message_class=messages.HPChange):
-        self.hp -= damage
+    def do_damage(self, damage, direct=False, message_class=messages.HPChange,
+                **extra_message_args):
         Effect.damage_done(self, damage)
+        self.change_hp(-damage, direct, message_class, **extra_message_args)
+
+    def change_hp(self, delta, direct=False, message_class=messages.HPChange,
+                **extra_message_args):
+        self.hp += delta
+        if self.hp > self.stats.hp:
+            self.hp = self.stats.hp
         self.field.message(message_class, battler=self, direct=direct,
-                delta=-damage, hp=self.hp)
+                delta=delta, hp=self.hp, **extra_message_args)
         if self.hp <= 0:
             self.field.message.Fainted(battler=self)
             self.status = 'fnt'
