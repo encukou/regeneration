@@ -170,7 +170,7 @@ class MoveEffect(object):
                     delta=delta, pp=self.move.pp, cause=self)
 
     def determine_critical_hit(self, hit):
-        stage = Effect.critical_hit_stage(self, 1)
+        stage = Effect.critical_hit_stage(hit, 1)
         rate = {
                 1: Fraction(1, 16),
                 2: Fraction(1, 8),

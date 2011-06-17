@@ -343,7 +343,7 @@ class Effect(object):
         return speed_factor
 
     @chain
-    def critical_hit_stage(self, field, stage):
+    def critical_hit_stage(self, moveeffect, stage):
         """Modify the critical hit stage
         """
         return stage
