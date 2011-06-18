@@ -18,10 +18,14 @@ class EffectSubject(object):
 
     active_subsubjects = ()
 
-    def apply_effect(self, effect, inducer):
+    def apply_effect(self, effect, inducer,
+            message_class=None, **message_args):
         """Apply an Effect to this subject.
 
-        Returns the effect, or None on failure
+        Returns the effect, or None on failure.
+
+        If message_class is given, the corresponding message is sent out if
+        the effect is successfully applied, before triggering other effects.
         """
         if not effect:
             return None
@@ -34,18 +38,22 @@ class EffectSubject(object):
         if Effect.block_application(effect):
             return None
         self.effects.append(effect)
+        if message_class:
+            self.field.message(message_class, **message_args)
         Effect.effect_applied(effect)
         return effect
 
-    def give_effect(self, target, effect):
+    def give_effect(self, target, effect, message_class=None, **message_args):
         """Apply an effect to a given target, with this as the inducer
         """
-        return target.apply_effect(effect, inducer=self)
+        return target.apply_effect(effect, inducer=self,
+                message_class=message_class, **message_args)
 
-    def give_effect_self(self, effect):
+    def give_effect_self(self, effect, message_class=None, **message_args):
         """Apply an effect to this subject, making it the inducer also
         """
-        return self.apply_effect(effect, inducer=self)
+        return self.apply_effect(effect, inducer=self,
+                message_class=message_class, **message_args)
 
     def get_effects(self, effect_class=None):
         """Yield all effects of the given class.
