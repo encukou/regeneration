@@ -78,7 +78,10 @@ class MoveEffect(object):
 
     def miss(self, hit):
         """Move missed"""
-        self.field.message.Miss(hit=hit)
+        if self.targetting.single_target:
+            self.field.message.Miss(hit=hit)
+        else:
+            self.field.message.Avoid(hit=hit)
         return
 
     def attempt_use(self, **kwargs):

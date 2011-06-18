@@ -222,6 +222,10 @@ class Miss(Message):
     message = "{hit.moveeffect.user}'s attack missed."
     hit = MessageArgument()
 
+class Avoid(Miss):
+    message = "{hit.target} avoided the hit!"
+    hit = MessageArgument()
+
 class Failed(Message):
     message = "But, it failed."
     moveeffect = MessageArgument()

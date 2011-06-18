@@ -67,12 +67,14 @@ def has_identifier(identifier):
 @has_identifier('specific-move')
 class TargetMove(MoveTargetting):
     """Target a specific move."""
+    single_target = True
     # Should be handled in the move effect
 
 @has_identifier('selected-battler')
 class TargetSelectedOpponent(MoveTargetting):
     """Target a specific battler."""
     needs_selected_target = True
+    single_target = True
 
     @classmethod
     def choice_list(cls, user):
@@ -82,6 +84,7 @@ class TargetSelectedOpponent(MoveTargetting):
 class TargetAlly(MoveTargetting):
     """Target an ally."""
     needs_selected_target = True
+    single_target = True
 
     @classmethod
     def choice_list(cls, user):
@@ -89,18 +92,21 @@ class TargetAlly(MoveTargetting):
 
 @has_identifier('users-field')
 class TargetUserSide(MoveTargetting):
+    single_target = False
     @classmethod
     def affected_areas(cls, move_effect, targets):
         return [move_effect.user.side]
 
 @has_identifier('user-or-ally')
 class TargetUserOrAlly(MoveTargetting):
+    single_target = True
     @classmethod
     def choice_list(cls, user):
         return user + [user.allies]
 
 @has_identifier('opponents-field')
 class TargetOpponentSide(MoveTargetting):
+    single_target = False
     @classmethod
     def choice_list(cls, user):
         return user.opponents
@@ -111,19 +117,21 @@ class TargetOpponentSide(MoveTargetting):
 
 @has_identifier('user')
 class TargetUser(MoveTargetting):
+    single_target = True
     @classmethod
     def targets(cls, move_effect, chosen_target):
         return []
 
 @has_identifier('random-opponent')
 class TargetRandomOpponent(MoveTargetting):
+    single_target = True
     @classmethod
     def targets(cls, move_effect, chosen_target):
         return [cls.random_choice(move_effect.field, user.opponents)]
 
 @has_identifier('all-others')
 class TargetAllOthers(MoveTargetting):
-    needsTarget = True
+    single_target = False
 
     @classmethod
     def targets(cls, move_effect, chosen_target):
@@ -131,7 +139,7 @@ class TargetAllOthers(MoveTargetting):
 
 @has_identifier('all-opponents')
 class TargetAllOpponents(MoveTargetting):
-    needsTarget = True
+    single_target = False
 
     @classmethod
     def targets(cls, move_effect, chosen_target):
@@ -139,6 +147,7 @@ class TargetAllOpponents(MoveTargetting):
 
 @has_identifier('entire-field')
 class TargetField(MoveTargetting):
+    single_target = False
     @classmethod
     def affected_areas(cls, move_effect, targets):
         return [move_effect.user.field]
