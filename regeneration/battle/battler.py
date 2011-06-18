@@ -181,16 +181,8 @@ class Battler(EffectSubject):
         return real_delta
 
     def message_values(self, trainer):
-        hp_fraction = Fraction(self.hp, self.stats.hp).limit_denominator(48)
-        if trainer == self.trainer:
-            hp = self.hp
-        else:
-            hp = None
         return dict(
-                id=id(self.monster),
                 name=self.name,
-                hp_fraction=[hp_fraction.numerator, hp_fraction.denominator],
-                hp=hp,
                 spot=self.spot.message_values(trainer),
             )
 

@@ -120,6 +120,5 @@ class Trainer(object):
 
     def message_values(self, private=True):
         return dict(
-                id=id(self),
                 name=self.name,
             )

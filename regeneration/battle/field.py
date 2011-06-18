@@ -43,8 +43,8 @@ class Side(EffectSubject):
     def __str__(self):
         return "<Side %s>" % self.number
 
-    def message_values(self, public=False):
-        return dict(id=id(self), name='Side %s' % self.number)
+    def message_values(self, trainer=None):
+        return self.number
 
 class Spot(object):
     def __init__(self, side, number, trainer):
@@ -56,6 +56,7 @@ class Spot(object):
 
     def message_values(self, trainer):
         return dict(
+                number=self.number,
                 trainer=self.trainer.message_values(trainer),
                 side=self.side.message_values(trainer),
             )

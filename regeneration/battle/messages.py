@@ -20,8 +20,11 @@ for type_ in (int, unicode, bool, type(None)):
 class MessageArgument(object):
     pass
 
+
+message_registry = {}
+
 class MessageMeta(Mapping.__metaclass__):
-    def __new__(meta, name, bases, attrs):
+    def __new__(meta, classname, bases, attrs):
         argument_types = dict()
         for base in bases:
             if isinstance(base, MessageMeta):
@@ -31,8 +34,20 @@ class MessageMeta(Mapping.__metaclass__):
                 value.name = name
                 argument_types[name] = value
                 del attrs[name]
-        cls = super(MessageMeta, meta).__new__(meta, name, bases, attrs)
-        cls._classname = '%s.%s' % (cls.__module__, name)
+        cls = super(MessageMeta, meta).__new__(meta, classname, bases, attrs)
+        try:
+            registry_name = attrs['registry_name']
+        except KeyError:
+            cls.registry_name = registry_name = classname
+        if registry_name in message_registry:
+            raise ValueError(
+                    "%s already registered to %s, can't replace with %s" % (
+                        registry_name,
+                        message_registry[registry_name],
+                        cls,
+                    )
+                )
+        message_registry[registry_name] = cls
         cls.argument_types = argument_types
         return cls
 
@@ -54,16 +69,17 @@ class Message(Mapping):
         if kwargs:
             raise ValueError("Extra keyword arguments: %s" % ', '.join(kwargs))
 
-    def contents(self, trainer=None):
+    def contents(self, trainer=None, save=True):
         try:
             return self._contents[trainer]
         except KeyError:
             contents = dict()
+            contents['class'] = self.registry_name
             for name, arg_type in self.argument_types.items():
                 value = self.arguments[name]
                 contents[name] = message_values(value, trainer)
-            contents['class'] = self._classname
-            self._contents[trainer] = contents
+            if save:
+                self._contents[trainer] = contents
             return contents
 
     def __getattr__(self, attr):
@@ -113,7 +129,7 @@ class BattleEnd(Message):
     side = MessageArgument()
 
 class Victory(BattleEnd):
-    message = "{side} won!"
+    message = "Side {side} won!"
 
 class Draw(BattleEnd):
     message = "It's a draw!"
@@ -203,7 +219,7 @@ def effectivity(hit, **kwargs):
         return SuperEffective(hit=hit, **kwargs)
 
 class Miss(Message):
-    message = "{hit.user}'s attack missed."
+    message = "{hit.moveeffect.user}'s attack missed."
     hit = MessageArgument()
 
 class Failed(Message):

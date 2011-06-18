@@ -189,8 +189,6 @@ class MoveEffect(object):
         else:
             target = None
         return dict(
-                id=id(self),
-                name=self.move.name,
                 move=self.move.message_values(trainer),
                 user=self.user.message_values(trainer),
                 target=target,
@@ -223,4 +221,7 @@ class Hit(object):
         return effectivity
 
     def message_values(self, trainer):
-        return self.move_effect.message_values(trainer)
+        return dict(
+                moveeffect=self.move_effect.message_values(trainer),
+                target=self.target.message_values(trainer),
+            )
