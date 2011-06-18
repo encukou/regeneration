@@ -54,6 +54,8 @@ class Battler(EffectSubject):
         self.item_effect = None
         self.item = monster.item
 
+        self.used_move_effects = []
+
     @property
     def fainted(self):
         return self.hp <= 0

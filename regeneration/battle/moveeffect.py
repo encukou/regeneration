@@ -90,11 +90,12 @@ class MoveEffect(object):
         self.field.message.UseMove(battler=self.user, moveeffect=self)
         self.targets = list(self.get_targets(**kwargs))
         self.deduct_pp()
+        self.user.used_move_effects.append(self)
         hits = self.use(**kwargs)
         return hits
 
     def use(self, **kwargs):
-        self.targets = list(self.get_targets(**kwargs))
+        self.targets = list(self.targets)
         hits = list(self.hits(**kwargs))
         if not hits:
             self.field.message.NoTarget(moveeffect=self)
