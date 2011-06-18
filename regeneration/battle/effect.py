@@ -96,7 +96,7 @@ class EffectSubject(object):
                         try:
                             orderkey = callback.orderkey
                         except AttributeError:
-                            yield None, callback
+                            yield None, effect, callback
                         else:
                             if callable(orderkey):
                                 orderkey = orderkey(effect)
@@ -104,8 +104,9 @@ class EffectSubject(object):
                                     for key in orderkey:
                                         yield key, callback
                                     continue
-                            yield orderkey, callback
-        return [v for k, v in sorted(generator())]
+                            yield orderkey, effect, callback
+        return (v for k, e, v in sorted(generator())
+                if e in self.active_effects)
 
 def return_list(func):
     @wraps(func)
