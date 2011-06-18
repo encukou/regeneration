@@ -387,7 +387,7 @@ class Field(EffectSubject):
 
         Effect.end_turn(self)
 
-        if self.check_win():
+        if self.state == 'finished' or self.check_win():
             return
 
         self.message.TurnEnd(turn=self.turn_number)

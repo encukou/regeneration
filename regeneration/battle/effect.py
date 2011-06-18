@@ -102,7 +102,7 @@ class EffectSubject(object):
                                 orderkey = orderkey(effect)
                                 if isinstance(orderkey, collections.Iterator):
                                     for key in orderkey:
-                                        yield key, callback
+                                        yield key, effect, callback
                                     continue
                             yield orderkey, effect, callback
         return (v for k, e, v in sorted(generator())
@@ -164,6 +164,17 @@ class chain(callback):
         for method in self.get_effect_methods(owner, object):
             value = method(object, value, *args, **kwargs)
         return value
+
+class callback_any(callback):
+    """A callback that runs until the first true value, and returns it.
+
+    If no true value is found, returns None.
+    """
+    def run_all(self, owner, object, *args, **kwargs):
+        for method in self.get_effect_methods(owner, object):
+            value = method(object, *args, **kwargs)
+            if value:
+                return value
 
 class Effect(object):
     """An effect is something that interacts with moves, other effects, and
@@ -272,14 +283,14 @@ class Effect(object):
         """Called when battler is withdrawn from battle (incl. after fainting)
         """
 
-    @callback
+    @callback_any
     def end_turn(self, field):
-        """Called when a turn ends.
+        """Called when a turn ends. Return true only if the battle should end.
         """
 
     # Cancellers/forcers
 
-    @callback
+    @callback_any
     def block_application(self, effect):
         """Called when the effect is applied; return a modified effect, or None
 
@@ -288,13 +299,13 @@ class Effect(object):
         """
         return False
 
-    @callback
+    @callback_any
     def prevent_move_selection(self, command):
         """Return true to prevent the selection of a move
         """
         return False
 
-    @callback
+    @callback_any
     def prevent_use(self, move_effect):
         """Return true to prevent the use of a move
 
@@ -302,17 +313,17 @@ class Effect(object):
         """
         return False
 
-    @callback
+    @callback_any
     def prevent_hit(self, hit):
         """Return true to prevent a move's hit
         """
 
-    @callback
+    @callback_any
     def prevent_switch(self, command):
         """Return true to prevent a switch
         """
 
-    @callback
+    @callback_any
     def force_critical_hit(self, hit):
         """Return true to prevent a switch
         """
