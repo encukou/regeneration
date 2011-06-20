@@ -135,7 +135,7 @@ class TargetAllOthers(MoveTargetting):
 
     @classmethod
     def targets(cls, move_effect, chosen_target):
-        return move_effect.user.opponents + move_effect.allies
+        return move_effect.user.opponents + move_effect.user.allies
 
 @has_identifier('all-opponents')
 class TargetAllOpponents(MoveTargetting):
