@@ -30,6 +30,10 @@ class Command(object):
         return self.request.battler
 
     @property
+    def trainer(self):
+        return self.request.trainer
+
+    @property
     def allowed(self):
         return self.field.command_allowed(self)
 
@@ -45,6 +49,11 @@ class MoveCommand(Command):
         super(MoveCommand, self).__init__(request)
         self.move = move
         self.target = target
+        if target is None:
+            try:
+                self.target = self.possible_targets[0]
+            except IndexError:
+                pass
 
     @property
     def possible_targets(self):
@@ -159,3 +168,7 @@ class CommandRequest(object):
     @property
     def field(self):
         return self.spot.field
+
+    @property
+    def trainer(self):
+        return self.spot.trainer

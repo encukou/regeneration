@@ -118,6 +118,7 @@ class TargetOpponentSide(MoveTargetting):
 @has_identifier('user')
 class TargetUser(MoveTargetting):
     single_target = True
+
     @classmethod
     def targets(cls, move_effect, chosen_target):
         return []
@@ -125,6 +126,7 @@ class TargetUser(MoveTargetting):
 @has_identifier('random-opponent')
 class TargetRandomOpponent(MoveTargetting):
     single_target = True
+
     @classmethod
     def targets(cls, move_effect, chosen_target):
         return [cls.random_choice(move_effect.field, user.opponents)]

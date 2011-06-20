@@ -203,7 +203,7 @@ class NotVeryEffective(EffectivityBase):
 
 class NormallyEffective(EffectivityBase):
     message = "It's normally effective!"
-    shown = False
+    shown = None
 
 class SuperEffective(EffectivityBase):
     message = "It's super effective!"

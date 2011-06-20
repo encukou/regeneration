@@ -152,7 +152,7 @@ class MoveEffect(object):
         hit.damage = self.calculate_damage(hit)
         if hit.damage:
             hit.target.do_damage(hit.damage, direct=True)
-            Effect.move_damage_done(hit.target, hit.damage)
+            Effect.move_damage_done(hit)
         return hit.damage
 
     def calculate_damage(self, hit):

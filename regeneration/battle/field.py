@@ -274,7 +274,7 @@ class Field(EffectSubject):
             else:
                 self.state = 'processing'
                 if process:
-                    self.doTurn()
+                    self.do_turn()
 
     def process_replacements(self):
         """Send out monsters to replace those that have fainted."""
