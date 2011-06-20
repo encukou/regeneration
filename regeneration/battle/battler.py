@@ -165,7 +165,7 @@ class Battler(EffectSubject):
         value = round_func(base * Fraction(numerator, denominator))
         return Effect.modify_stat(self, value, stat)
 
-    def raise_stat(self, stat, delta, verbose=True):
+    def change_stat(self, stat, delta, verbose=True):
         previous = self.stat_levels[stat]
         result = self.stat_levels[stat] + delta
         if result > 6:
@@ -177,7 +177,8 @@ class Battler(EffectSubject):
         if verbose:
             direction = (delta > 0) - (delta < 0)
             self.field.message.StatChange(battler=self, stat=stat,
-                    delta=real_delta, direction=direction)
+                    delta=real_delta, direction=direction,
+                    requested_delta=delta)
         return real_delta
 
     def message_values(self, trainer):
