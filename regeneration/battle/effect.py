@@ -291,12 +291,12 @@ class Effect(object):
         """Called when battler is withdrawn from battle (incl. after fainting)
         """
 
+    # Cancellers/forcers
+
     @callback_any
     def end_turn(self, field):
         """Called when a turn ends. Return true only if the battle should end.
         """
-
-    # Cancellers/forcers
 
     @callback_any
     def block_application(self, effect):
@@ -345,7 +345,7 @@ class Effect(object):
         return accuracy
 
     @chain
-    def modify_move_damage(self, target, damage, hit):
+    def modify_move_damage(self, hit, damage):
         """Modify a hit's damage
         """
         return damage

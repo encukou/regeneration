@@ -446,7 +446,7 @@ class Field(EffectSubject):
         damage = ((user.level * 2 // 5 + 2) *
                 hit.power * attack // 50 // defense)
 
-        damage = Effect.modify_move_damage(self, damage, hit)
+        damage = Effect.modify_move_damage(hit, damage)
 
         if damage < 1:
             damage = 1
