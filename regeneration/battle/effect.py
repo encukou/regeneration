@@ -291,6 +291,11 @@ class Effect(object):
         """Called when battler is withdrawn from battle (incl. after fainting)
         """
 
+    @callback
+    def move_used(self, move_effect):
+        """Called when a move is used
+        """
+
     # Cancellers/forcers
 
     @callback_any

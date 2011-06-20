@@ -91,6 +91,7 @@ class MoveEffect(object):
 
     def do_use(self, **kwargs):
         self.field.message.UseMove(battler=self.user, moveeffect=self)
+        Effect.move_used(self)
         self.targets = list(self.get_targets(**kwargs))
         self.deduct_pp()
         self.user.used_move_effects.append(self)
