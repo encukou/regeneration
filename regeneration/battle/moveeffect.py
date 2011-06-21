@@ -133,6 +133,11 @@ class MoveEffect(object):
         if hit.accuracy is None or Effect.ensure_hit(hit):
             return True
         else:
+            hit.accuracy = (hit.accuracy *
+                    hit.user.stats.accuracy /
+                    hit.target.stats.evasion)
+            # XXX: Is this the correct rounding?
+            hit.accuracy = Fraction(int(hit.accuracy * 100), 100)
             accuracy = Effect.modify_accuracy(hit, hit.accuracy)
             return self.field.flip_coin(accuracy, 'Determine hit')
 
