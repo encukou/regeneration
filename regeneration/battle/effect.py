@@ -395,3 +395,9 @@ class Effect(object):
         """Modify the type effectivity of a hit
         """
         return effectivity
+
+    @chain
+    def modify_secondary_chance(self, hit, chance):
+        """Modify the chance for a move's secondary effect
+        """
+        return effectivity

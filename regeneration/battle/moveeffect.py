@@ -160,8 +160,9 @@ class MoveEffect(object):
         return self.field.calculate_damage(hit)
 
     def attempt_secondary_effect(self, hit):
-        if self.field.flip_coin(self.secondary_effect_chance,
-                'Attempt secondary effect'):
+        chance = Effect.modify_secondary_chance(hit,
+                self.secondary_effect_chance)
+        if self.field.flip_coin(chance, 'Attempt secondary effect'):
             self.do_secondary_effect(hit)
 
     def do_secondary_effect(self, hit):
