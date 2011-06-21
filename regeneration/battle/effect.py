@@ -384,3 +384,9 @@ class Effect(object):
         """Modify the base power of a move
         """
         return power
+
+    @chain
+    def modify_effectivity(self, hit, effectivity):
+        """Modify the type effectivity of a hit
+        """
+        return effectivity

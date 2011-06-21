@@ -222,7 +222,7 @@ class Hit(object):
         for type in self.target.types:
             efficacy, = [e for e in efficacies if e.target_type == type]
             effectivity *= Fraction(efficacy.damage_factor, 100)
-        return effectivity
+        return Effect.modify_effectivity(self, effectivity)
 
     def message_values(self, trainer):
         return dict(
