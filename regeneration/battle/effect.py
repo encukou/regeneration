@@ -338,7 +338,12 @@ class Effect(object):
 
     @callback_any
     def force_critical_hit(self, hit):
-        """Return true to prevent a switch
+        """Return true to force a critical hit
+        """
+
+    @callback_any
+    def ensure_hit(self, hit):
+        """Return true to ensure a move hits, regardless of accuracy
         """
 
     # Chainers

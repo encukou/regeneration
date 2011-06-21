@@ -130,7 +130,7 @@ class MoveEffect(object):
         return self.do_hit(hit)
 
     def roll_accuracy(self, hit):
-        if hit.accuracy is None:
+        if hit.accuracy is None or Effect.ensure_hit(hit):
             return True
         else:
             accuracy = Effect.modify_accuracy(hit, hit.accuracy)
