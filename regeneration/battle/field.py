@@ -440,9 +440,12 @@ class Field(EffectSubject):
         hit.move_effect.determine_critical_hit(hit)
         if hit.is_critical:
             self.message.CriticalHit(hit=hit)
+            attack = user.get_stat(attack_stat, min_change_level=0)
+            defense = target.get_stat(defense_stat, max_change_level=0)
+        else:
+            attack = user.stats[attack_stat]
+            defense = target.stats[defense_stat]
 
-        attack = user.stats[attack_stat]
-        defense = target.stats[defense_stat]
         damage = ((user.level * 2 // 5 + 2) *
                 hit.power * attack // 50 // defense)
 

@@ -152,10 +152,14 @@ class Battler(EffectSubject):
     def get_item_effect(self):
         return None
 
-    def get_stat(self, stat):
+    def get_stat(self, stat, min_change_level=None, max_change_level=None):
         if stat.identifier == 'hp':
             return self.monster.stats[stat]
         level = self.stat_levels[stat]
+        if min_change_level is not None and level < min_change_level:
+            level = min_change_level
+        if max_change_level is not None and level > max_change_level:
+            level = max_change_level
         if stat in self.monster.stats:
             base = self.monster.stats[stat]
             numerator = denominator = 2
