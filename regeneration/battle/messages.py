@@ -257,7 +257,7 @@ class StatChange(Message):
         elif delta == 1:
             self.message = "{battler}'s {stat} rose! {requested_delta}"
         elif delta >= 2:
-            self.message = "{battler}'s {stat} sharply rose!"
+            self.message = "{battler}'s {stat} rose sharply!"
 
 
 class GainAbility(Message):
