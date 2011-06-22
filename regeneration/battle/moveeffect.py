@@ -181,6 +181,9 @@ class MoveEffect(object):
                     delta=delta, pp=self.move.pp, cause=self)
 
     def determine_critical_hit(self, hit):
+        if Effect.prevent_critical_hit(hit):
+            hit.is_critical = False
+            return
         stage = Effect.critical_hit_stage(hit, 1)
         rate = {
                 1: Fraction(1, 16),

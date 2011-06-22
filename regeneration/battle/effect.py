@@ -342,6 +342,11 @@ class Effect(object):
         """
 
     @callback_any
+    def prevent_critical_hit(self, hit):
+        """Return true to prevent a critical hit
+        """
+
+    @callback_any
     def ensure_hit(self, hit):
         """Return true to ensure a move hits, regardless of accuracy
         """
