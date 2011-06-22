@@ -421,41 +421,6 @@ class Field(EffectSubject):
         else:
             raise NotImplementedError(command.command)
 
-    def calculate_damage(self, hit):
-        damage_class = hit.damage_class
-        user = hit.user
-        target = hit.target
-
-        if damage_class.identifier == 'physical':
-            attack_stat = self.loader.load_stat('attack')
-            defense_stat = self.loader.load_stat('defense')
-        else:
-            attack_stat = self.loader.load_stat('special-attack')
-            defense_stat = self.loader.load_stat('special-defense')
-
-        self.message.effectivity(hit=hit)
-        if not hit.effectivity:
-            return None
-
-        hit.move_effect.determine_critical_hit(hit)
-        if hit.is_critical:
-            self.message.CriticalHit(hit=hit)
-            attack = user.get_stat(attack_stat, min_change_level=0)
-            defense = target.get_stat(defense_stat, max_change_level=0)
-        else:
-            attack = user.stats[attack_stat]
-            defense = target.stats[defense_stat]
-
-        damage = ((user.level * 2 // 5 + 2) *
-                hit.power * attack // 50 // defense)
-
-        damage = Effect.modify_move_damage(hit, damage)
-
-        if damage < 1:
-            damage = 1
-
-        return damage
-
     def switch(self, spot, replacement):
         self.withdraw(spot.battler)
         self.release_monster(spot, replacement)

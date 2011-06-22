@@ -161,8 +161,40 @@ class MoveEffect(object):
         return hit.damage
 
     def calculate_damage(self, hit):
-        # This is too mechanic-specific to have in MoveEffect
-        return self.field.calculate_damage(hit)
+        damage_class = hit.damage_class
+        user = hit.user
+        target = hit.target
+
+        loader = self.field.loader
+        if damage_class.identifier == 'physical':
+            attack_stat = loader.load_stat('attack')
+            defense_stat = loader.load_stat('defense')
+        else:
+            attack_stat = loader.load_stat('special-attack')
+            defense_stat = loader.load_stat('special-defense')
+
+        self.field.message.effectivity(hit=hit)
+        if not hit.effectivity:
+            return None
+
+        hit.is_critical = hit.move_effect.determine_critical_hit(hit)
+        if hit.is_critical:
+            self.field.message.CriticalHit(hit=hit)
+            attack = user.get_stat(attack_stat, min_change_level=0)
+            defense = target.get_stat(defense_stat, max_change_level=0)
+        else:
+            attack = user.stats[attack_stat]
+            defense = target.stats[defense_stat]
+
+        damage = ((user.level * 2 // 5 + 2) *
+                hit.power * attack // 50 // defense)
+
+        damage = Effect.modify_move_damage(hit, damage)
+
+        if damage < 1:
+            damage = 1
+
+        return damage
 
     def attempt_secondary_effect(self, hit):
         chance = Effect.modify_secondary_chance(hit,
@@ -182,8 +214,7 @@ class MoveEffect(object):
 
     def determine_critical_hit(self, hit):
         if Effect.prevent_critical_hit(hit):
-            hit.is_critical = False
-            return
+            return False
         stage = Effect.critical_hit_stage(hit, 1)
         rate = {
                 1: Fraction(1, 16),
@@ -193,8 +224,10 @@ class MoveEffect(object):
                 5: Fraction(1, 2),
             }[min(stage, 5)]
         hit.is_critical = self.field.flip_coin(rate, 'Determine critical hit')
-        if not hit.is_critical:
-            hit.is_critical = Effect.force_critical_hit(self)
+        if hit.is_critical:
+            return True
+        else:
+            return Effect.force_critical_hit(self)
 
     def message_values(self, trainer):
         if trainer == self.user.trainer and self.target:
