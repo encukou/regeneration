@@ -461,9 +461,9 @@ class Field(EffectSubject):
         self.release_monster(spot, replacement)
 
     def withdraw(self, battler):
-        Effect.withdraw(battler)
         if not battler.fainted:
             self.message.Withdraw(battler=battler)
+        Effect.withdraw(battler)
         battler.spot.battler = None
 
     def release_monster(self, spot, monster):
