@@ -255,7 +255,7 @@ class StatChange(Message):
         elif delta == 0 and direction > 0:
             self.message = "{battler}'s {stat} won't go higher!"
         elif delta == 1:
-            self.message = "{battler}'s {stat} rose! {requested_delta}"
+            self.message = "{battler}'s {stat} rose!"
         elif delta >= 2:
             self.message = "{battler}'s {stat} rose sharply!"
 
