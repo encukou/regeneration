@@ -124,7 +124,7 @@ class MoveEffect(object):
 
     def attempt_hit(self, hit):
         if Effect.prevent_hit(hit):
-            return self.fail(hit)
+            return None
         elif not self.roll_accuracy(hit):
             return self.miss(hit)
         return self.do_hit(hit)
