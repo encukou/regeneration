@@ -201,6 +201,9 @@ class Effect(object):
     with something like "if subject is self.subject".
 
     Always apply effects using effectSubject methods (giveEffect etc.).
+
+    When used as a context manager, an Effect will remove itself when exiting
+    the context.
     """
     unique_class = None
 
@@ -209,6 +212,12 @@ class Effect(object):
     def __init__(self):
         """Always call EffectSubject's methods to properly apply Effects!
         """
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.remove()
 
     @staticmethod
     def orderkey(key):
