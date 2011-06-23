@@ -90,7 +90,7 @@ class EffectSubject(object):
             for effect in subsubject.active_effects:
                 yield effect
 
-    def get_effect_methods(self, cls, attr, object):
+    def get_effect_methods(self, cls, attr, object, arguments):
         """Yields an attribute for all active effects of a given class.
         """
         def generator():
@@ -114,7 +114,9 @@ class EffectSubject(object):
                                     continue
                             yield orderkey, effect, callback
         return (v for k, e, v in sorted(generator())
-                if e in self.active_effects)
+                if e in self.active_effects and
+                        not any(ef.disable_callback(e, v.__name__, arguments)
+                                for ef in self.active_effects))
 
 def return_list(func):
     @wraps(func)
@@ -145,13 +147,14 @@ class callback(object):
         else:
             return wraps(self.func)(partial(self.run_all, owner))
 
-    def get_effect_methods(self, owner, object):
-        return object.field.get_effect_methods(owner, self.name, object)
+    def get_effect_methods(self, owner, object, arguments):
+        return object.field.get_effect_methods(owner, self.name, object,
+                arguments)
 
     @return_list
-    def run_all(self, owner, object, *args, **kwargs):
-        for method in self.get_effect_methods(owner, object):
-            value = method(object, *args, **kwargs)
+    def run_all(self, owner, object, *args):
+        for method in self.get_effect_methods(owner, object, args):
+            value = method(object, *args)
             if value:
                 yield value
 
@@ -168,9 +171,9 @@ class chain(callback):
     the body of the decorated function is ignored.
     """
 
-    def run_all(self, owner, object, value, *args, **kwargs):
-        for method in self.get_effect_methods(owner, object):
-            value = method(object, value, *args, **kwargs)
+    def run_all(self, owner, object, value, *args):
+        for method in self.get_effect_methods(owner, object, args):
+            value = method(object, value, *args)
         return value
 
 class callback_any(callback):
@@ -178,9 +181,9 @@ class callback_any(callback):
 
     If no true value is found, returns None.
     """
-    def run_all(self, owner, object, *args, **kwargs):
-        for method in self.get_effect_methods(owner, object):
-            value = method(object, *args, **kwargs)
+    def run_all(self, owner, object, *args):
+        for method in self.get_effect_methods(owner, object, args):
+            value = method(object, *args)
             if value:
                 return value
 
@@ -255,6 +258,11 @@ class Effect(object):
 
     def __repr__(self):
         return "<%s 0x%x>" % (self.__class__.__name__, id(self))
+
+    def disable_callback(self, effect, callback_name, arguments):
+        """Return true to disable another effect's callback.
+        """
+        return False
 
     # Notifications
 
