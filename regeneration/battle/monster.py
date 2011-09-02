@@ -59,7 +59,7 @@ class Monster(object):
 
         self.tameness = self.species.base_happiness
 
-        self.shiny = random.randint(0, 65535) < 8
+        self.shiny = rand.randint(0, 65535) < 8
 
         if _load_moves:
             self.set_moves(self.default_moves(loader))
