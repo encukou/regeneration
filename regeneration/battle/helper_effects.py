@@ -26,10 +26,8 @@ class CriticalHitModifier(Effect):
 class RandomizeDamage(Effect):
     @Effect.orderkey(orderkeys.mod3.new_before())
     def modify_move_damage(self, hit, damage):
-        damage *= hit.field.randint(217, 255, 'Randomizing move damage')
-        damage *= 100
-        damage = int(damage / 255)
-        damage /= 100
+        damage *= hit.field.randint(85, 100, 'Randomizing move damage')
+        damage = int(damage / 100)
         return damage
 
 class DamageStabModifier(Effect):
