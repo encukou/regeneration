@@ -77,6 +77,10 @@ class SwitchCommand(Command):
     def args(self):
         return self.replacement,
 
+    def __repr__(self):
+        return "<SwitchCommand: %s to %s>" % (self.battler,
+                self.replacement)
+
 class ItemCommand(Command):
     command = 'item'
     def __init__(self, request, item):
@@ -87,6 +91,10 @@ class ItemCommand(Command):
     def args(self):
         return self.item,
 
+    def __repr__(self):
+        return "<ItemCommand: %s's turn, use %s>" % (self.battler,
+                self.item)
+
 class RunCommand(Command):
     command = 'run'
     def __init__(self, request):
@@ -95,6 +103,9 @@ class RunCommand(Command):
     @property
     def args(self):
         return ()
+
+    def __repr__(self):
+        return "<RunCommand: %s's turn>" % (self.battler)
 
 def filter_allowed(func):
     def inner(self, *args, **kwargs):

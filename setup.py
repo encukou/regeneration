@@ -12,7 +12,7 @@ __email__ = 'encukou@gmail.com'
 setup(
     name='regeneration-battle',
     version=__version__,
-    description=u'A pocket monster battle engine',
+    description=u'A monster battle engine',
     author=__author__,
     author_email=__email__,
     install_requires=[
