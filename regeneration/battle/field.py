@@ -61,6 +61,10 @@ class Spot(object):
                 side=self.side.message_values(trainer),
             )
 
+    @property
+    def turn_order(self):
+        return self.field.turn_order.index(self)
+
 class Field(EffectSubject):
     BattlerClass = Battler
     message_module = messages
@@ -288,7 +292,8 @@ class Field(EffectSubject):
             spot = battler.spot
             self.switch(spot, command.replacement)
 
-        commands.sort(key=lambda c: -c.replacement.stats.speed)
+        trick_factor = Effect.speed_factor(self, 1)
+        commands.sort(key=lambda c: -c.replacement.stats.speed * trick_factor)
         for command in commands:
             Effect.send_out(command.battler.spot.battler)
 
@@ -359,6 +364,8 @@ class Field(EffectSubject):
 
         self.turnCommands = commands = self.sort_commands(commands)
 
+        self.turn_order = [c.request.spot for c in commands]
+
         move_effects = {}
 
         for command in commands:
@@ -393,6 +400,8 @@ class Field(EffectSubject):
         self.message.TurnEnd(turn=self.turn_number)
 
         # That's it for this turn!
+        del self.turn_order
+
         if not self.ended:
             self.state = 'waiting'
             self.ask_for_commands()
