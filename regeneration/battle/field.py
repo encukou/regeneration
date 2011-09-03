@@ -398,6 +398,7 @@ class Field(EffectSubject):
             self.ask_for_commands()
 
     def sort_commands(self, commands):
+        commands.sort(key=lambda c: c.order_key)
         self.shuffle(commands, 'Shuffle commands before sorting')
         commands.sort(key=self.command_sort_order)
         return commands

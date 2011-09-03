@@ -43,6 +43,11 @@ class Command(object):
     def __ne__(self, other):
         return not self == other
 
+    @property
+    def order_key(self):
+        spot = self.request.spot
+        return spot.side.number, spot.number
+
 class MoveCommand(Command):
     command = 'move'
     def __init__(self, request, move, target=None):
