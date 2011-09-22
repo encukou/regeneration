@@ -96,6 +96,8 @@ class MoveEffect(object):
         self.deduct_pp()
         self.user.used_move_effects.append(self)
         hits = self.use(**kwargs)
+        if hits:
+            Effect.move_hits_done(self, [hit for hit in hits if hit])
         return hits
 
     def use(self, **kwargs):

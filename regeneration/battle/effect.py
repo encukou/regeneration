@@ -313,6 +313,11 @@ class Effect(object):
         """Called when a move is used
         """
 
+    @callback
+    def move_hits_done(self, move_effect, hits):
+        """Called when all of a move's hits have been executed
+        """
+
     # Cancellers/forcers
 
     @callback_any
