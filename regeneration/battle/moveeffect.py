@@ -197,10 +197,11 @@ class MoveEffect(object):
         return damage
 
     def attempt_secondary_effect(self, hit):
-        chance = Effect.modify_secondary_chance(hit,
-                self.secondary_effect_chance)
-        if self.field.flip_coin(chance, 'Attempt secondary effect'):
-            self.do_secondary_effect(hit)
+        if not hit.target.fainted:
+            chance = Effect.modify_secondary_chance(hit,
+                    self.secondary_effect_chance)
+            if self.field.flip_coin(chance, 'Attempt secondary effect'):
+                self.do_secondary_effect(hit)
 
     def do_secondary_effect(self, hit):
         pass
