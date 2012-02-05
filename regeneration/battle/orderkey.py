@@ -45,7 +45,7 @@ import itertools
 class OrderKeys(object):
     """An extensible ordering key class
 
-    The goal of the OrderKey class is to have a sorted sequence of objects
+    The goal of the OrderKeys class is to have a sorted sequence of objects
     which can act as sort keys, and to which items may be added at any time,
     in any place, without disturbing the order of the original keys.
 
@@ -75,14 +75,14 @@ class OrderKeys(object):
             return False
 
     def __iter__(self):
-        """Iterate this key's sequence"""
+        """Iterate this equence"""
         yv = self.first
         while yv:
             yield yv
             yv = yv.next
 
     def __reversed__(self):
-        """Iterate this key's sequence in reverse"""
+        """Iterate this sequence in reverse"""
         yv = self.last
         while yv:
             yield yv
