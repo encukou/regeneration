@@ -16,7 +16,8 @@ class EffectSubject(object):
         self.effects = []
         self.field = field
 
-    active_subsubjects = ()
+    subsubjects = ()
+    is_active_subject = True
 
     def apply_effect(self, effect, inducer,
             message_class=None, **message_args):
@@ -86,9 +87,11 @@ class EffectSubject(object):
         for effect in self.effects[:]:
             if effect.active:
                 yield effect
-        for subsubject in self.active_subsubjects:
+        for subsubject in self.subsubjects:
             for effect in subsubject.active_effects:
-                yield effect
+                if (subsubject.is_active_subject or
+                        effect.active_on_fainted_subject):
+                    yield effect
 
     def get_effect_methods(self, cls, attr, object, arguments):
         """Yields an attribute for all active effects of a given class.
@@ -200,7 +203,7 @@ class Effect(object):
     interesting or overridable happens. Thus, many effect methods will start
     with something like "if subject is self.subject".
 
-    Always apply effects using effectSubject methods (giveEffect etc.).
+    Always apply effects using effectSubject methods (give_effect etc.).
 
     When used as a context manager, an Effect will remove itself when exiting
     the context.
@@ -208,6 +211,7 @@ class Effect(object):
     unique_class = None
 
     active = False
+    active_on_fainted_subject = False
 
     def __init__(self):
         """Always call EffectSubject's methods to properly apply Effects!

@@ -61,6 +61,10 @@ class Battler(EffectSubject):
         return self.hp <= 0
 
     @property
+    def is_active_subject(self):
+        return not self.fainted
+
+    @property
     def name(self):
         return self.monster.name
 

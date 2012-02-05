@@ -117,11 +117,12 @@ class Field(EffectSubject):
         return self.state == 'finished'
 
     @property
-    def active_subsubjects(self):
+    def subsubjects(self):
         for side in self.sides:
             yield side
-        for battler in self.battlers:
-            yield battler
+        for spot in self.spots:
+            if spot.battler:
+                yield spot.battler
 
     def assert_state(self, *states):
         if self.state not in states:
